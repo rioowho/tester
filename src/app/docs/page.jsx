@@ -210,8 +210,8 @@ export default function Home() {
         </div>
       )}
     </div>
- }
-);
+  );
+}
 <style jsx>{`
 .endpoint {
     background: #2D1B55;
