@@ -61,8 +61,8 @@ export default function Home() {
     const style = document.createElement("style");
     style.innerHTML = `
       body {
-        background-color: #0f0f1a;
-        color: #e0e0e0;
+        background-color: #1e1e30;
+        color: #ffffff;
         font-family: 'Inter', sans-serif;
       }
 
@@ -73,7 +73,7 @@ export default function Home() {
       }
 
       .swagger-ui .topbar {
-        background: linear-gradient(135deg, #1a1b2f, #14152a);
+        background: linear-gradient(135deg, #29294d, #2e2e5a);
         padding: 15px;
         border-radius: 8px;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -81,8 +81,8 @@ export default function Home() {
 
       /* Kategori API */
       .api-category {
-        background: #17172b;
-        border: 1px solid #24243e;
+        background: #29294d;
+        border: 1px solid #3a3a6a;
         padding: 16px;
         margin-bottom: 12px;
         border-radius: 10px;
@@ -91,7 +91,7 @@ export default function Home() {
       }
 
       .api-category:hover {
-        background: #202040;
+        background: #343463;
       }
 
       .api-category-header {
@@ -100,7 +100,7 @@ export default function Home() {
         align-items: center;
         font-size: 18px;
         font-weight: bold;
-        color: #b0b0ff;
+        color: #d0d0ff;
       }
 
       .api-category-content {
@@ -114,7 +114,7 @@ export default function Home() {
 
       /* Tombol */
       .swagger-ui button {
-        background: linear-gradient(135deg, #6a5acd, #8a2be2);
+        background: linear-gradient(135deg, #4f46e5, #6a5acd);
         color: white;
         padding: 10px 16px;
         border-radius: 8px;
@@ -123,29 +123,29 @@ export default function Home() {
       }
 
       .swagger-ui button:hover {
-        background: linear-gradient(135deg, #8a2be2, #9932cc);
+        background: linear-gradient(135deg, #6a5acd, #8a2be2);
       }
 
       /* Input dan Textarea */
       .swagger-ui input, .swagger-ui textarea {
-        background-color: #1d1e33;
+        background-color: #2d2d55;
         color: #fff;
-        border: 1px solid #444;
+        border: 1px solid #5555aa;
         border-radius: 8px;
         padding: 10px;
       }
 
       /* Endpoint Card */
       .api-endpoint {
-        background: #202040;
-        border: 1px solid #2a2a4a;
+        background: #29294d;
+        border: 1px solid #3c3c7a;
         padding: 14px;
         border-radius: 10px;
         margin-bottom: 10px;
       }
 
       .api-endpoint:hover {
-        border-color: #4c4cff;
+        border-color: #5c5cff;
       }
 
       .api-endpoint-header {
@@ -158,7 +158,7 @@ export default function Home() {
       .api-endpoint-method {
         font-weight: bold;
         color: #32cd32;
-        background: #224422;
+        background: #3a5f3a;
         padding: 4px 8px;
         border-radius: 6px;
       }
@@ -172,7 +172,7 @@ export default function Home() {
     return () => {
       document.head.removeChild(style);
     };
-  }, []);
+}, []);
 
   return (
     <>
