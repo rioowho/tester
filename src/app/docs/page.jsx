@@ -115,103 +115,81 @@ export default function Home() {
     setInputFields({});
   };
 
-  const clearApiResponse = () => {
-    setApiResponse(null);
-  };
+  const closeModal = () => {
+  setInputFields({});
+  setApiResponse(null);
+  setShowInput(false);
+};
 
-  return (
-    <>
-      <Head>
-        <title>VelynAPI</title>
-      </Head>
-      <main className="container">
-        <h1 className="title">VelynAPI Documentation</h1>
-        <p className="total-endpoints">Total API Endpoints: {totalEndpoints}</p>
+{showInput && selectedEndpoint && (
+  <div className="floating-modal">
+    <div className="modal-content">
+      <h3>Masukkan Data</h3>
 
-        {loading ? (
-          <p className="loading-text">Memuat kategori...</p>
-        ) : (
-          Object.keys(endpointsByTag).map((tag) => (
-            <div key={tag} className="category-wrapper">
-              <div className="api-category" onClick={() => toggleCategory(tag)}>
-                <span>{tag.toUpperCase()}</span>
-                <span className="category-count">{endpointsByTag[tag].length} endpoints</span>
-                <span className="icon">{expandedTag === tag ? "▼" : ">"}</span>
-              </div>
-
-              {expandedTag === tag && (
-                <div className="endpoint">
-                  {endpointsByTag[tag].map((endpoint, index) => (
-                    <div key={index} className="api-endpoint">
-                      <div className="endpoint-header">
-                        <span className={`api-method ${endpoint.method.toLowerCase()}`}>
-                          {endpoint.method}
-                        </span>
-                        <span className="endpoint-path">{endpoint.path}</span>
-                        <button className="endpoint-btn" onClick={() => openInputModal(endpoint)}>
-                          ➜
-                        </button>
-                      </div>
-                      <p className="endpoint-description">{endpoint.description}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))
-        )}
-
-        {showInput && selectedEndpoint && (
-          <div className="floating-modal">
-            <div className="modal-content">
-              <h3>Masukkan Data</h3>
-
-              {selectedEndpoint.parameters.length > 0 ? (
-                selectedEndpoint.parameters.map((param) => (
-                  <div key={param.name} className="input-group">
-                    <label>{param.name}</label>
-                    <input
-                      type="text"
-                      placeholder={`Masukkan ${param.name}`}
-                      value={inputFields[param.name] || ""}
-                      onChange={(e) => handleInputChange(param.name, e.target.value)}
-                    />
-                  </div>
-                ))
-              ) : (
-                <p className="no-input">Endpoint ini tidak memerlukan input.</p>
-              )}
-
-              <div className="floating-buttons">
-                <button className="bubble-button" onClick={closeModal}>Tutup</button>
-                <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
-              </div>
-            </div>
+      {selectedEndpoint.parameters.length > 0 ? (
+        selectedEndpoint.parameters.map((param) => (
+          <div key={param.name} className="input-group">
+            <label>{param.name}</label>
+            <input
+              type="text"
+              placeholder={`Masukkan ${param.name}`}
+              value={inputFields[param.name] || ""}
+              onChange={(e) => handleInputChange(param.name, e.target.value)}
+            />
           </div>
-        )}
+        ))
+      ) : (
+        <p className="no-input">Endpoint ini tidak memerlukan input.</p>
+      )}
 
-        {apiResponse !== null && (
-          <div className="api-result">
-            <h3>Response Body</h3>
-            <button className="copy-btn" onClick={() => navigator.clipboard.writeText(JSON.stringify(apiResponse, null, 2))}>
-              Copy
-            </button>
-            <pre>{JSON.stringify(apiResponse, null, 2)}</pre>
-            <button className="download-btn" onClick={() => {
-              const blob = new Blob([JSON.stringify(apiResponse, null, 2)], { type: "application/json" });
+      <div className="floating-buttons">
+        <button className="bubble-button" onClick={closeModal}>Tutup</button>
+        <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
+      </div>
+      {apiResponse !== null && (
+        <div className="api-result">
+          <h3>Response Body</h3>
+          <button 
+            className="copy-btn" 
+            onClick={() => navigator.clipboard.writeText(
+              typeof apiResponse === "object" 
+                ? JSON.stringify(apiResponse, null, 2) 
+                : apiResponse
+            )}
+          >
+            Copy
+          </button>
+          
+          <pre>
+            {typeof apiResponse === "object"
+              ? JSON.stringify(apiResponse, null, 2)
+              : apiResponse}
+          </pre>
+          
+          <button 
+            className="download-btn" 
+            onClick={() => {
+              const blob = new Blob(
+                [typeof apiResponse === "object" 
+                  ? JSON.stringify(apiResponse, null, 2) 
+                  : apiResponse], 
+                { type: "application/json" }
+              );
               const url = URL.createObjectURL(blob);
               const a = document.createElement("a");
               a.href = url;
-              a.download = "result.json";
+              a.download = "api_response.json";
               a.click();
               URL.revokeObjectURL(url);
-            }}>
-              <i className="fas fa-download"></i> Download
-            </button>
-            <button className="clear-btn" onClick={clearApiResponse}>Hapus Result</button>
-          </div>
-        )}
-      </main>
+            }}
+          >
+            <i className="fas fa-download"></i> Download
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+)}
 <style jsx>{`
 .endpoint {
     background: #2D1B55;
