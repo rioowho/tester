@@ -13,15 +13,7 @@ export default function Home() {
   const [inputFields, setInputFields] = useState({});
   const [apiResponse, setApiResponse] = useState(null);
 
-  useEffect(() => {
-    const endpointsMap = calculateEndpointsByTag(swaggerConfig);
-    setEndpointsByTag(endpointsMap);
-    setTotalEndpoints(
-      Object.values(endpointsMap).reduce((sum, endpoints) => sum + endpoints.length, 0)
-    );
-    setLoading(false);
-  }, []);
-
+  // Pindahkan fungsi ke atas agar tidak terjadi error
   const calculateEndpointsByTag = (swaggerData) => {
     const tagEndpointMap = {};
     if (!swaggerData?.paths) return tagEndpointMap;
@@ -46,6 +38,20 @@ export default function Home() {
 
     return tagEndpointMap;
   };
+
+  useEffect(() => {
+    const endpointsMap = calculateEndpointsByTag(swaggerConfig);
+    setEndpointsByTag(endpointsMap);
+
+    // Perbaikan perhitungan total endpoints
+    const total = Object.values(endpointsMap).reduce(
+      (sum, endpoints) => sum + endpoints.length,
+      0
+    );
+    setTotalEndpoints(total);
+
+    setLoading(false);
+  }, []);
 
   const toggleCategory = (tag) => {
     setExpandedTag(expandedTag === tag ? null : tag);
@@ -105,11 +111,11 @@ export default function Home() {
 
       setApiResponse(data);
     } catch (error) {
-      setApiResponse({ error: error.message || "Gagal mengambil data. Periksa kembali input yang dimasukkan." });
+      setApiResponse({ error: error.message || "Gagal mengambil data." });
     }
 
+    // Tetap tampilkan modal, tetapi reset input setelah pengiriman
     setInputFields({});
-    setShowInput(true);
   };
 
   return (
@@ -186,19 +192,13 @@ export default function Home() {
             <h3>Hasil API Response</h3>
             <div className="result-content">
               {typeof apiResponse === "object" && !Array.isArray(apiResponse) ? (
-                Object.keys(apiResponse).length > 0 ? (
-                  Object.entries(apiResponse).map(([key, value], index) => (
-                    <div key={index} className="result-item">
-                      <strong>{key}:</strong> {JSON.stringify(value)}
-                    </div>
-                  ))
-                ) : (
-                  <p className="no-result">Response tidak berisi data.</p>
-                )
+                Object.entries(apiResponse).map(([key, value], index) => (
+                  <div key={index} className="result-item">
+                    <strong>{key}:</strong> {JSON.stringify(value)}
+                  </div>
+                ))
               ) : (
-                <p className="error-message">
-                  {typeof apiResponse === "string" ? apiResponse : "Terjadi kesalahan dalam mengambil data."}
-                </p>
+                <p className="error-message">{apiResponse || "Terjadi kesalahan."}</p>
               )}
             </div>
           </div>
