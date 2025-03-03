@@ -109,17 +109,18 @@ export default function Home() {
   <div 
     style={{
       position: "fixed",
-      bottom: "50px",
-      right: "50px",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
       width: "90%",
       maxWidth: "1000px",
-      background: "#220f40", // Warna ungu gelap
+      height: "80vh", 
+      background: "#220f40",
       borderRadius: "15px",
       padding: "20px",
       boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
-      overflowX: "auto",
+      overflowY: "auto", // Tambahkan scroll jika konten terlalu panjang
       zIndex: 1000,
-      transition: "transform 0.3s ease-in-out",
     }}
   >
     {/* Tombol silang untuk menutup */}
@@ -141,7 +142,7 @@ export default function Home() {
     <SwaggerUI
       spec={{
         ...swaggerConfig,
-        info: {}, // Menghapus bagian atas Swagger UI
+        info: {},
         paths: Object.fromEntries(
           Object.entries(swaggerConfig.paths).filter(([_, value]) =>
             Object.values(value).some((method) => method.tags?.includes(selectedCategory))
