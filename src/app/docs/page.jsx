@@ -24,22 +24,26 @@ export default function Home() {
 
   const calculateEndpointsByTag = (swaggerData) => {
     const tagEndpointMap = {};
+    if (!swaggerData?.paths) return tagEndpointMap;
+
     Object.keys(swaggerData.paths).forEach((path) => {
       Object.keys(swaggerData.paths[path]).forEach((method) => {
         const operation = swaggerData.paths[path][method];
-        if (operation.tags) {
-          operation.tags.forEach((tag) => {
-            if (!tagEndpointMap[tag]) tagEndpointMap[tag] = [];
-            tagEndpointMap[tag].push({
-              method: method.toUpperCase(),
-              path,
-              description: operation.summary || "Deskripsi tidak tersedia",
-              parameters: operation.parameters || [],
-            });
+
+        if (!operation?.tags) return;
+
+        operation.tags.forEach((tag) => {
+          if (!tagEndpointMap[tag]) tagEndpointMap[tag] = [];
+          tagEndpointMap[tag].push({
+            method: method.toUpperCase(),
+            path,
+            description: operation?.summary || "Deskripsi tidak tersedia",
+            parameters: operation?.parameters || [],
           });
-        }
+        });
       });
     });
+
     return tagEndpointMap;
   };
 
@@ -93,10 +97,10 @@ export default function Home() {
       }
 
       let data;
-      if (contentType && contentType.includes("application/json")) {
+      if (contentType?.includes("application/json")) {
         data = await response.json();
       } else {
-        data = await response.text(); // Jika bukan JSON, baca sebagai teks biasa
+        data = await response.text();
       }
 
       setApiResponse(data);
@@ -137,10 +141,7 @@ export default function Home() {
                           {endpoint.method}
                         </span>
                         <span className="endpoint-path">{endpoint.path}</span>
-                        <button
-                          className="endpoint-btn"
-                          onClick={() => openInputModal(endpoint)}
-                        >
+                        <button className="endpoint-btn" onClick={() => openInputModal(endpoint)}>
                           ➜
                         </button>
                       </div>
@@ -206,7 +207,7 @@ export default function Home() {
     </>
   );
 }
-      <style jsx>{`
+<style jsx>{`
 .endpoint {
     background: #2D1B55;
     border-radius: 0.75rem;
