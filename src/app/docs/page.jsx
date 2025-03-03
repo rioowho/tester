@@ -146,48 +146,45 @@ export default function Home() {
         <button className="bubble-button" onClick={closeModal}>Tutup</button>
         <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
       </div>
-      {apiResponse !== null && (
-        <div className="api-result">
-          <h3>Response Body</h3>
-          <button 
-            className="copy-btn" 
-            onClick={() => navigator.clipboard.writeText(
-              typeof apiResponse === "object" 
-                ? JSON.stringify(apiResponse, null, 2) 
-                : apiResponse
-            )}
-          >
-            Copy
-          </button>
-          
-          <pre>
-            {typeof apiResponse === "object"
-              ? JSON.stringify(apiResponse, null, 2)
-              : apiResponse}
-          </pre>
-          
-          <button 
-            className="download-btn" 
-            onClick={() => {
-              const blob = new Blob(
-                [typeof apiResponse === "object" 
-                  ? JSON.stringify(apiResponse, null, 2) 
-                  : apiResponse], 
-                { type: "application/json" }
-              );
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = "api_response.json";
-              a.click();
-              URL.revokeObjectURL(url);
-            }}
-          >
-            <i className="fas fa-download"></i> Download
-          </button>
-        </div>
-      )}
-</main>
+{apiResponse !== null && (
+                <div className="api-result">
+                  <h3>Response Body</h3>
+                  <button className="copy-btn" onClick={() => navigator.clipboard.writeText(
+                      typeof apiResponse === "object" 
+                        ? JSON.stringify(apiResponse, null, 2) 
+                        : apiResponse
+                    )}>
+                    Copy
+                  </button>
+                  
+                  <pre>
+                    {typeof apiResponse === "object"
+                      ? JSON.stringify(apiResponse, null, 2)
+                      : apiResponse}
+                  </pre>
+                  
+                  <button className="download-btn" onClick={() => {
+                      const blob = new Blob(
+                        [typeof apiResponse === "object" 
+                          ? JSON.stringify(apiResponse, null, 2) 
+                          : apiResponse], 
+                        { type: "application/json" }
+                      );
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = "api_response.json";
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    }}>
+                    <i className="fas fa-download"></i> Download
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
 <style jsx>{`
 .endpoint {
     background: #2D1B55;
