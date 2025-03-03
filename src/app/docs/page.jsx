@@ -88,7 +88,6 @@ export default function Home() {
       setApiResponse({ error: "Gagal mengambil data. Periksa kembali input yang dimasukkan." });
     }
 
-    // Reset input & tutup modal setelah request
     setInputFields({});
     setShowInput(false);
   };
@@ -181,7 +180,7 @@ export default function Home() {
         }
 
         .api-category {
-          background: #3a3a6e;
+          background: linear-gradient(135deg, #4c6ef5, #6574cd);
           padding: 16px;
           border-radius: 12px;
           display: flex;
@@ -190,31 +189,22 @@ export default function Home() {
           cursor: pointer;
           margin-bottom: 10px;
           transition: all 0.3s ease-in-out;
+          color: white;
         }
 
         .api-category:hover {
           background: #5050a1;
         }
 
-        .modal {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          align-items: center;
-          justify-content: center;
+        .response-text {
+          word-wrap: break-word;
+          white-space: pre-wrap;
+          max-width: 100%;
+          overflow-x: auto;
         }
 
-        .modal-content {
-          position: relative;
-          background: #2b2b5a;
-          padding: 20px;
-          border-radius: 8px;
-          width: 90%;
-          max-width: 500px;
+        .modal-content .input-group {
+          margin-bottom: 12px;
         }
 
         .modal-buttons {
