@@ -29,6 +29,7 @@ export default function Home() {
               path,
               description: operation?.summary || "Deskripsi tidak tersedia",
               parameters: operation?.parameters || [],
+              serverUrl: swaggerData.servers?.[0]?.url || "", // Mengambil base URL dari swaggerConfig
             });
           });
         });
@@ -60,6 +61,7 @@ export default function Home() {
     setInputFields(defaultInputs);
     setSelectedEndpoint(endpoint);
     setShowInput(true);
+    setApiResponse(null); // Reset response lama
   };
 
   const closeModal = () => {
@@ -68,10 +70,56 @@ export default function Home() {
     setShowInput(false);
   };
 
+  const handleApiRequest = async (endpoint) => {
+    setApiResponse(null);
+
+    if (!endpoint.serverUrl) {
+      setApiResponse({ error: "Base URL tidak ditemukan di swaggerConfig" });
+      return;
+    }
+
+    let url = `${endpoint.serverUrl}${endpoint.path}`;
+    const method = endpoint.method;
+
+    const headers = { "Content-Type": "application/json" };
+
+    // Menangani parameter query untuk GET request
+    if (method === "GET") {
+      const queryParams = new URLSearchParams(
+        Object.fromEntries(
+          Object.entries(inputFields).filter(([_, value]) => value.trim() !== "")
+        )
+      ).toString();
+      if (queryParams) url += `?${queryParams}`;
+    }
+
+    const body =
+      method === "GET"
+        ? undefined
+        : JSON.stringify(
+            Object.fromEntries(
+              Object.entries(inputFields).filter(([_, value]) => value.trim() !== "")
+            )
+          );
+
+    try {
+      const response = await fetch(url, {
+        method,
+        headers,
+        body,
+      });
+
+      const result = await response.json();
+      setApiResponse(result);
+    } catch (error) {
+      setApiResponse({ error: "Gagal mengambil data dari API" });
+    }
+  };
+
   return (
     <>
       <Head>
-        <title>API Explorer</title>
+        <title>VelynApi</title>
       </Head>
 
       <main>
