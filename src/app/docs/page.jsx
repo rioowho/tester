@@ -13,14 +13,13 @@ export default function Home() {
   const [inputFields, setInputFields] = useState({});
   const [apiResponse, setApiResponse] = useState(null);
 
+  // Fungsi menghitung total endpoint berdasarkan kategori (tags)
   const calculateEndpointsByTag = (swaggerData) => {
     const tagEndpointMap = {};
     if (!swaggerData?.paths) return tagEndpointMap;
 
-    Object.keys(swaggerData.paths).forEach((path) => {
-      Object.keys(swaggerData.paths[path]).forEach((method) => {
-        const operation = swaggerData.paths[path][method];
-
+    Object.entries(swaggerData.paths).forEach(([path, methods]) => {
+      Object.entries(methods).forEach(([method, operation]) => {
         if (!operation?.tags) return;
 
         operation.tags.forEach((tag) => {
@@ -41,8 +40,12 @@ export default function Home() {
   useEffect(() => {
     const endpointsMap = calculateEndpointsByTag(swaggerConfig);
     setEndpointsByTag(endpointsMap);
+    
+    // Menghitung total endpoints
     const total = Object.values(endpointsMap).reduce(
-      (sum, endpoints) => sum + endpoints.length);
+      (sum, endpoints) => sum + endpoints.length,
+      0
+    );
     setTotalEndpoints(total);
 
     setLoading(false);
@@ -62,55 +65,59 @@ export default function Home() {
     setShowInput(true);
   };
 
-const closeModal = () => {
-  setInputFields({});
-  setApiResponse(null); 
-  setShowInput(false);
-};
+  const closeModal = () => {
+    setInputFields({});
+    setApiResponse(null); // Hasil response terhapus otomatis saat modal ditutup
+    setShowInput(false);
+  };
 
   const handleInputChange = (param, value) => {
     setInputFields((prev) => ({ ...prev, [param]: value }));
   };
 
   const handleApiRequest = async () => {
-  if (!selectedEndpoint) return;
+    if (!selectedEndpoint) return;
 
-  let finalUrl = selectedEndpoint.path;
-  Object.keys(inputFields).forEach((param) => {
-    finalUrl = finalUrl.replace(`{${param}}`, inputFields[param]);
-  });
+    let finalUrl = selectedEndpoint.path;
+    Object.keys(inputFields).forEach((param) => {
+      finalUrl = finalUrl.replace(`{${param}}`, inputFields[param]);
+    });
 
-  const options = {
-    method: selectedEndpoint.method,
-    headers: { "Content-Type": "application/json" },
+    const options = {
+      method: selectedEndpoint.method,
+      headers: { "Content-Type": "application/json" },
+    };
+
+    if (selectedEndpoint.method === "POST") {
+      options.body = JSON.stringify(inputFields);
+    }
+
+    try {
+      const response = await fetch(finalUrl, options);
+      const contentType = response.headers.get("content-type");
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      let data;
+      if (contentType?.includes("application/json")) {
+        data = await response.json();
+      } else {
+        data = await response.text();
+      }
+
+      setApiResponse(data);
+    } catch (error) {
+      setApiResponse({ error: error.message || "Gagal mengambil data." });
+    }
+
+    setInputFields({});
   };
 
-  if (selectedEndpoint.method === "POST") {
-    options.body = JSON.stringify(inputFields);
-  }
-
-  try {
-    const response = await fetch(finalUrl, options);
-    const contentType = response.headers.get("content-type");
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    let data;
-    if (contentType?.includes("application/json")) {
-      data = await response.json();
-    } else {
-      data = await response.text();
-    }
-
-    setApiResponse(data);
-  } catch (error) {
-    setApiResponse({ error: error.message || "Gagal mengambil data." });
-  }
-
-  setInputFields({});
-};
+  const clearApiResponse = () => {
+    setApiResponse(null);
+  };
 
   return (
     <>
@@ -154,57 +161,56 @@ const closeModal = () => {
           ))
         )}
 
-{showInput && selectedEndpoint && (
-  <div className="floating-modal">
-    <div className="modal-content">
-      <button className="close-btn" onClick={closeModal}>✖</button>
-      <h3>Masukkan Data</h3>
+        {showInput && selectedEndpoint && (
+          <div className="floating-modal">
+            <div className="modal-content">
+              <h3>Masukkan Data</h3>
 
-      {selectedEndpoint.parameters.length > 0 ? (
-        selectedEndpoint.parameters.map((param) => (
-          <div key={param.name} className="input-group">
-            <label>{param.name}</label>
-            <input
-              type="text"
-              placeholder={`Masukkan ${param.name}`}
-              value={inputFields[param.name] || ""}
-              onChange={(e) => handleInputChange(param.name, e.target.value)}
-            />
+              {selectedEndpoint.parameters.length > 0 ? (
+                selectedEndpoint.parameters.map((param) => (
+                  <div key={param.name} className="input-group">
+                    <label>{param.name}</label>
+                    <input
+                      type="text"
+                      placeholder={`Masukkan ${param.name}`}
+                      value={inputFields[param.name] || ""}
+                      onChange={(e) => handleInputChange(param.name, e.target.value)}
+                    />
+                  </div>
+                ))
+              ) : (
+                <p className="no-input">Endpoint ini tidak memerlukan input.</p>
+              )}
+
+              <div className="floating-buttons">
+                <button className="bubble-button" onClick={closeModal}>Tutup</button>
+                <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
+              </div>
+            </div>
           </div>
-        ))
-      ) : (
-        <p className="no-input">Endpoint ini tidak memerlukan input.</p>
-      )}
+        )}
 
-      <div className="floating-buttons">
-        <button className="bubble-button" onClick={closeModal}>Tutup</button>
-        <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
-      </div>
-    </div>
-  </div>
-)}
-
-{apiResponse !== null && (
-  <div className="api-result">
-    <h3>Response Body</h3>
-    <button className="copy-btn" onClick={() => navigator.clipboard.writeText(JSON.stringify(apiResponse, null, 2))}>
-      Copy
-    </button>
-    <pre>{JSON.stringify(apiResponse, null, 2)}</pre>
-    <button className="download-btn" onClick={() => {
-      const blob = new Blob([JSON.stringify(apiResponse, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "api_response.json";
-      a.click();
-      URL.revokeObjectURL(url);
-    }}>
-      <i className="fas fa-download"></i> Download
-    </button>
-    <button className="clear-btn" onClick={clearApiResponse}>Hapus Result</button>
-  </div>
-)}
+        {apiResponse !== null && (
+          <div className="api-result">
+            <h3>Response Body</h3>
+            <button className="copy-btn" onClick={() => navigator.clipboard.writeText(JSON.stringify(apiResponse, null, 2))}>
+              Copy
+            </button>
+            <pre>{JSON.stringify(apiResponse, null, 2)}</pre>
+            <button className="download-btn" onClick={() => {
+              const blob = new Blob([JSON.stringify(apiResponse, null, 2)], { type: "application/json" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = "result.json";
+              a.click();
+              URL.revokeObjectURL(url);
+            }}>
+              <i className="fas fa-download"></i> Download
+            </button>
+            <button className="clear-btn" onClick={clearApiResponse}>Hapus Result</button>
+          </div>
+        )}
       </main>
 <style jsx>{`
 .endpoint {
