@@ -210,8 +210,7 @@ export default function Home() {
         </div>
       )}
     </div>
-  );
-}
+    </main>
 
 <style jsx>{`
   .endpoint {
