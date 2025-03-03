@@ -17,137 +17,164 @@ export default function Home() {
 
   useEffect(() => {
     let count = 0;
-    const categoryMap = {};
+    const categoryCount = {};
 
     if (swaggerConfig.paths) {
-      Object.entries(swaggerConfig.paths).forEach(([_, path]) => {
-        if (path.tags) {
-          path.tags.forEach((tag) => {
-            if (!categoryMap[tag]) {
-              categoryMap[tag] = 0;
-            }
-            categoryMap[tag] += 1;
-          });
-        }
-        count++;
+      Object.entries(swaggerConfig.paths).forEach(([path, methods]) => {
+        Object.values(methods).forEach((method) => {
+          if (method.tags) {
+            method.tags.forEach((tag) => {
+              if (!categoryCount[tag]) {
+                categoryCount[tag] = 0;
+              }
+              categoryCount[tag] += 1;
+            });
+          }
+          count += 1;
+        });
       });
     }
 
     setTotalEndpoints(count);
-    setCategories(Object.entries(categoryMap).map(([name, total]) => ({ name, total })));
+    setCategories(Object.entries(categoryCount).map(([name, count]) => ({ name, count })));
   }, []);
-
-  const filteredPaths = selectedCategory
-    ? Object.fromEntries(
-        Object.entries(swaggerConfig.paths).filter(([_, path]) =>
-          path.tags && path.tags.includes(selectedCategory)
-        )
-      )
-    : swaggerConfig.paths;
 
   return (
     <>
       <Head>
         <title>VelynAPI</title>
+        <meta name="description" content="VelynApi is a free, simple REST API." />
       </Head>
 
-      <main className={`min-h-screen flex flex-col items-center ${inter.className}`} style={{ backgroundColor: "#0d0d1a", color: "white" }}>
+      <main className={`min-h-screen flex flex-col items-center justify-center ${inter.className}`} style={{ backgroundColor: "#0d0d1a", color: "white" }}>
         <Analytics />
         <SpeedInsights />
 
         <div className="container">
-          <h1 className="title">Total Endpoints: {totalEndpoints}</h1>
+          <h1 className="total-endpoints">Total Endpoints: {totalEndpoints}</h1>
 
-          {/* Tombol Kategori API */}
-          <div className="category-buttons">
+          {/* Tombol kategori API */}
+          <div className="category-container">
             {categories.length > 0 ? (
               categories.map((category, index) => (
                 <button
                   key={index}
-                  className={`category-button ${selectedCategory === category.name ? "selected" : ""}`}
+                  className={`category-button ${selectedCategory === category.name ? "active" : ""}`}
                   onClick={() => setSelectedCategory(category.name)}
                 >
-                  {category.name} ({category.total})
+                  {category.name} ({category.count})
                 </button>
               ))
             ) : (
-              <p className="no-category">Tidak ada kategori tersedia</p>
+              <p>Tidak ada kategori tersedia</p>
             )}
           </div>
 
-          {/* Swagger UI untuk kategori yang dipilih */}
-          {selectedCategory && Object.keys(filteredPaths).length > 0 ? (
+          {/* Swagger UI hanya muncul jika kategori dipilih */}
+          {selectedCategory && (
             <div className="swagger-container">
-              <SwaggerUI spec={{ ...swaggerConfig, paths: filteredPaths }} />
+              <SwaggerUI
+                spec={{
+                  ...swaggerConfig,
+                  paths: Object.fromEntries(
+                    Object.entries(swaggerConfig.paths).filter(([_, value]) =>
+                      Object.values(value).some((method) => method.tags?.includes(selectedCategory))
+                    )
+                  ),
+                }}
+              />
             </div>
-          ) : selectedCategory ? (
-            <p className="no-api">Tidak ada API di kategori ini.</p>
-          ) : null}
+          )}
         </div>
       </main>
 
+      {/* Styling */}
       <style jsx>{`
         .container {
+          width: 90%;
           max-width: 1200px;
-          padding: 20px;
-          background-color: #111;
-          border-radius: 10px;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
           text-align: center;
+          padding: 20px;
         }
-
-        .title {
+        .total-endpoints {
           font-size: 24px;
           font-weight: bold;
+          text-align: center;
           margin-bottom: 20px;
-          color: white;
         }
-
-        .category-buttons {
+        .category-container {
           display: flex;
           flex-wrap: wrap;
-          gap: 12px;
+          gap: 10px;
           justify-content: center;
           margin-bottom: 20px;
         }
-
         .category-button {
-          background: #6a0dad;
-          padding: 12px 20px;
+          background: #5a0ca3;
+          padding: 12px 24px;
           border-radius: 8px;
           color: white;
           font-size: 16px;
           border: none;
           cursor: pointer;
-          transition: all 0.3s;
-          font-weight: bold;
-          box-shadow: 0 3px 5px rgba(255, 255, 255, 0.1);
+          transition: 0.3s ease-in-out;
+          box-shadow: 0 4px 6px rgba(90, 12, 163, 0.4);
         }
-
-        .category-button.selected {
-          background: #5a0ca3;
-          box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
-          transform: scale(1.05);
-        }
-
         .category-button:hover {
-          background: #5a0ca3;
+          background: #6a0dad;
           transform: scale(1.05);
         }
-
+        .category-button.active {
+          background: #4a0c83;
+          box-shadow: 0 6px 10px rgba(74, 12, 131, 0.5);
+        }
         .swagger-container {
-          width: 100%;
           margin-top: 20px;
           padding: 20px;
+          background: #1a1a2e;
           border-radius: 10px;
-          background-color: #1f1f2f;
-          box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+          box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
         }
 
-        .no-category, .no-api {
-          font-size: 18px;
-          color: #ccc;
-          margin-top: 10px;
+        /* Styling Swagger UI */
+        :global(.swagger-ui) {
+          background: #1a1a2e !important;
+          color: white !important;
+          border-radius: 10px;
+          padding: 15px;
+        }
+        :global(.swagger-ui .topbar) {
+          display: none;
+        }
+        :global(.swagger-ui .info) {
+          color: #e0e0ff !important;
+        }
+        :global(.swagger-ui .opblock) {
+          border-radius: 8px !important;
+          background: #2a2a3a !important;
+        }
+        :global(.swagger-ui .opblock-summary-method) {
+          color: white !important;
+          font-weight: bold;
+          padding: 8px;
+          border-radius: 5px;
+        }
+        :global(.swagger-ui .opblock-summary-method-get) {
+          background: #4a90e2 !important;
+        }
+        :global(.swagger-ui .opblock-summary-method-post) {
+          background: #2ecc71 !important;
+        }
+        :global(.swagger-ui .opblock-summary-path) {
+          color: #e0e0ff !important;
+        }
+        :global(.swagger-ui .btn) {
+          background: #5a0ca3 !important;
+          color: white !important;
+          border-radius: 5px !important;
+        }
+        :global(.swagger-ui .btn:hover) {
+          background: #6a0dad !important;
         }
       `}</style>
     </>
