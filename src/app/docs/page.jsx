@@ -3,14 +3,15 @@ import Head from "next/head";
 import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
 import { useEffect, useState } from "react";
-import { FaChevronDown, FaChevronRight } from "react-icons/fa"; // Import icon dari react-icons
-import swaggerConfig from "../swagger-config.json"; // Sesuaikan path ini dengan file swagger-config.json Anda
+import { FaChevronDown, FaChevronRight } from "react-icons/fa"; // Ikon dari react-icons
+import swaggerConfig from "../swagger-config.json"; // Sesuaikan path ini
 
 export default function Home() {
   const [endpointsByTag, setEndpointsByTag] = useState({});
   const [expandedTag, setExpandedTag] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Fungsi untuk membagi endpoint berdasarkan tag
   const calculateEndpointsByTag = (swaggerData) => {
     const tagEndpointMap = {};
     Object.keys(swaggerData.paths).forEach((path) => {
@@ -133,6 +134,26 @@ export default function Home() {
         cursor: pointer;
       }
 
+      /* Warna tombol dan elemen interaksi */
+      .swagger-ui .btn {
+        background-color: #3b82f6;
+        color: white;
+      }
+
+      .badge-status {
+        background-color: #00ff00;
+        color: black;
+        padding: 0.25em 0.5em;
+        border-radius: 0.25em;
+      }
+
+      .badge-version {
+        background-color: #3b82f6;
+        color: white;
+        padding: 0.25em 0.5em;
+        border-radius: 0.25em;
+      }
+
       /* Pastikan Swagger UI tetap dapat di-interaksi */
       .swagger-ui {
         pointer-events: auto;
@@ -151,34 +172,24 @@ export default function Home() {
         <meta name="title" content="VelynAPI - Dokumentasi" />
         <meta
           name="description"
-          content="VelynApi adalah REST API gratis dan sederhana yang dibuat oleh ErerexIDChx untuk kebaikan bersama. Silakan gunakan, tapi hindari serangan DDoS."
+          content="VelynApi adalah REST API gratis dan sederhana yang dibuat oleh ErerexIDChx untuk kebaikan bersama."
         />
-        <meta
-          name="keywords"
-          content="REST API, KyuuRzy, Siputzx, Qanypaw, Nawdev, Itzpire API, free API, dokumentasi API, bot wa, REST API gratis"
-        />
-        <meta name="robots" content="index, follow" />
-        <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="language" content="English, Indonesian" />
         <meta property="og:title" content="VelynAPI - Dokumentasi" />
         <meta
           property="og:description"
-          content="VelynApi adalah REST API gratis dan sederhana yang dibuat oleh ErerexIDChx untuk kebaikan bersama. Silakan gunakan, tapi hindari serangan DDoS."
+          content="VelynApi adalah REST API gratis dan sederhana yang dibuat oleh ErerexIDChx untuk kebaikan bersama."
         />
-        <meta property="og:url" content="https://kyuubeyours.us.kg" />
-        <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://files.catbox.moe/962uqd.jpg" />
-        <meta name="twitter:title" content="VelynAPI - Dokumentasi" />
-        <meta
-          name="twitter:description"
-          content="VelynApi adalah REST API gratis dan sederhana yang dibuat oleh ErerexIDChx untuk kebaikan bersama. Silakan gunakan, tapi hindari serangan DDoS."
-        />
-        <meta name="twitter:image" content="https://files.catbox.moe/962uqd.jpg" />
-        <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
       <main className={`p-6`}>
         <div className="bg-black shadow-md rounded-lg p-4">
+          <div className="flex justify-between items-center mb-4">
+            <h1 className="text-2xl font-bold text-white">Mistra API</h1>
+            <div className="flex space-x-4">
+              <span className="badge-status">200</span>
+              <span className="badge-version">v1.0</span>
+            </div>
+          </div>
           {loading ? (
             <p>Memuat endpoint...</p>
           ) : (
@@ -193,22 +204,17 @@ export default function Home() {
                   <span
                     className="icon"
                     onClick={(e) => {
-                      // Hentikan propagasi event untuk menghentikan interaksi dengan SwaggerUI
                       e.stopPropagation();
                       toggleCategory(tag);
                     }}
                   >
-                    {expandedTag === tag ? (
-                      <FaChevronDown /> // Ikon ketika diperluas
-                    ) : (
-                      <FaChevronRight /> // Ikon ketika dilipat
-                    )}
+                    {expandedTag === tag ? <FaChevronDown /> : <FaChevronRight />}
                   </span>
                 </div>
                 <div className="api-category-content">
                   {expandedTag === tag && (
                     <SwaggerUI
-                      key={tag} // Menggunakan tag sebagai key untuk memastikan render ulang
+                      key={tag}
                       spec={getFilteredSpec(tag)}
                     />
                   )}
