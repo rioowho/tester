@@ -68,55 +68,53 @@ export default function Home() {
   };
 
   const closeModal = () => {
-    setInputFields({});
-    setShowInput(false);
-    setApiResponse(null);
-  };
+  setInputFields({});
+  setShowInput(false);
+};
 
   const handleInputChange = (param, value) => {
     setInputFields((prev) => ({ ...prev, [param]: value }));
   };
 
   const handleApiRequest = async () => {
-    if (!selectedEndpoint) return;
+  if (!selectedEndpoint) return;
 
-    let finalUrl = selectedEndpoint.path;
-    Object.keys(inputFields).forEach((param) => {
-      finalUrl = finalUrl.replace(`{${param}}`, inputFields[param]);
-    });
+  let finalUrl = selectedEndpoint.path;
+  Object.keys(inputFields).forEach((param) => {
+    finalUrl = finalUrl.replace(`{${param}}`, inputFields[param]);
+  });
 
-    const options = {
-      method: selectedEndpoint.method,
-      headers: { "Content-Type": "application/json" },
-    };
-
-    if (selectedEndpoint.method === "POST") {
-      options.body = JSON.stringify(inputFields);
-    }
-
-    try {
-      const response = await fetch(finalUrl, options);
-      const contentType = response.headers.get("content-type");
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      let data;
-      if (contentType?.includes("application/json")) {
-        data = await response.json();
-      } else {
-        data = await response.text();
-      }
-
-      setApiResponse(data);
-    } catch (error) {
-      setApiResponse({ error: error.message || "Gagal mengambil data." });
-    }
-
-    // Tetap tampilkan modal, tetapi reset input setelah pengiriman
-    setInputFields({});
+  const options = {
+    method: selectedEndpoint.method,
+    headers: { "Content-Type": "application/json" },
   };
+
+  if (selectedEndpoint.method === "POST") {
+    options.body = JSON.stringify(inputFields);
+  }
+
+  try {
+    const response = await fetch(finalUrl, options);
+    const contentType = response.headers.get("content-type");
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    let data;
+    if (contentType?.includes("application/json")) {
+      data = await response.json();
+    } else {
+      data = await response.text();
+    }
+
+    setApiResponse(data);
+  } catch (error) {
+    setApiResponse({ error: error.message || "Gagal mengambil data." });
+  }
+
+  setInputFields({});
+};
 
   return (
     <>
@@ -483,7 +481,6 @@ export default function Home() {
         font-size: 1rem;
     }
 }
-/* Container hasil API */
 .api-result {
     background: rgba(45, 27, 85, 0.95); /* Ungu gelap transparan */
     color: white;
