@@ -70,36 +70,45 @@ export default function Home() {
     setShowInput(false);
   };
 
-  const handleApiRequest = async (endpoint) => {
-  setApiResponse(null);
-  const baseUrl = swaggerConfig.servers?.[0]?.url;
-  if (!baseUrl) {
-    setApiResponse({ error: "Base URL tidak ditemukan di swaggerConfig" });
-    return;
-  }
+const handleApiRequest = async () => {
+  if (!selectedEndpoint) return;
 
-  let url = `${baseUrl}${endpoint.path}`;
-  const method = endpoint.method;
-  const headers = { "Content-Type": "application/json" };
+  let finalUrl = selectedEndpoint.path;
+  Object.keys(inputFields).forEach((param) => {
+    finalUrl = finalUrl.replace(`{${param}}`, inputFields[param]);
+  });
 
-  if (method === "GET") {
-    // Buat parameter query
-    const queryParams = new URLSearchParams(
-      Object.fromEntries(
-        Object.entries(inputFields).filter(([_, value]) => value.trim() !== "")
-      )
-    ).toString();
-    
-    if (queryParams) url += `?${queryParams}`;
+  const options = {
+    method: selectedEndpoint.method,
+    headers: { "Content-Type": "application/json" },
+  };
+
+  if (selectedEndpoint.method === "POST") {
+    options.body = JSON.stringify(inputFields);
   }
 
   try {
-    const response = await fetch(url, { method, headers });
-    const result = await response.json();
-    setApiResponse(result);
+    const response = await fetch(finalUrl, options);
+    const contentType = response.headers.get("content-type");
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    let data;
+    if (contentType?.includes("application/json")) {
+      data = await response.json();
+    } else {
+      data = await response.text();
+    }
+
+    setApiResponse(data);
   } catch (error) {
-    setApiResponse({ error: "Gagal mengambil data dari API" });
+    setApiResponse({ error: error.message || "Gagal mengambil data." });
   }
+
+  // Reset input tanpa menghapus respons API
+  setInputFields({});
 };
 
   return (
