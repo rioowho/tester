@@ -19,7 +19,7 @@ export default function Home() {
     setTotalEndpoints(
       Object.values(endpointsMap).reduce((sum, endpoints) => sum + endpoints.length, 0)
     );
-    setLoading(false);
+    setLoading(true);
   }, []);
 
   const calculateEndpointsByTag = (swaggerData) => {
@@ -61,7 +61,7 @@ export default function Home() {
     setInputFields((prev) => ({ ...prev, [param]: value }));
   };
 
-  const handleApiRequest = async () => {
+  const handleApiRequest = async (method) => {
     if (!selectedEndpoint) return;
 
     let finalUrl = selectedEndpoint.path;
@@ -86,7 +86,7 @@ export default function Home() {
       setApiResponse({ error: "Gagal mengambil data. Periksa kembali input yang dimasukkan." });
     }
 
-    setShowInput(false);
+    setShowInput(true);
   };
 
   return (
@@ -153,6 +153,7 @@ export default function Home() {
               ) : (
                 <p className="no-input">Endpoint ini tidak memerlukan input.</p>
               )}
+              {/* Tombol Kirim di dalam modal-content dibuat floating */}
               <button className="floating-btn" onClick={handleApiRequest}>
                 ➤ Kirim
               </button>
@@ -198,8 +199,29 @@ export default function Home() {
           margin-top: 8px;
         }
 
-        .floating-btn {
+        .modal {
           position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .modal-content {
+          position: relative;
+          background: #2b2b5a;
+          padding: 20px;
+          border-radius: 8px;
+          width: 90%;
+          max-width: 500px;
+        }
+
+        .floating-btn {
+          position: absolute;
           bottom: 20px;
           right: 20px;
           background: #6a0dad;
@@ -214,6 +236,16 @@ export default function Home() {
 
         .floating-btn:hover {
           background: #822adf;
+        }
+
+        .response-box {
+          background: #2c2c5a;
+          padding: 15px;
+          border-radius: 8px;
+          margin-top: 40px;
+          overflow-x: auto;
+          white-space: pre-wrap;
+          word-wrap: break-word;
         }
       `}</style>
     </>
