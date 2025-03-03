@@ -11,16 +11,15 @@ export default function Home() {
   const [showInput, setShowInput] = useState(false);
   const [selectedEndpoint, setSelectedEndpoint] = useState(null);
   const [inputFields, setInputFields] = useState({});
+  const [apiResponse, setApiResponse] = useState(null);
 
   useEffect(() => {
-    setTimeout(() => {
-      const endpointsMap = calculateEndpointsByTag(swaggerConfig);
-      setEndpointsByTag(endpointsMap);
-      setTotalEndpoints(
-        Object.values(endpointsMap).reduce((sum, endpoints) => sum + endpoints.length, 0)
-      );
-      setLoading(false);
-    }, 1000);
+    const endpointsMap = calculateEndpointsByTag(swaggerConfig);
+    setEndpointsByTag(endpointsMap);
+    setTotalEndpoints(
+      Object.values(endpointsMap).reduce((sum, endpoints) => sum + endpoints.length, 0)
+    );
+    setLoading(false);
   }, []);
 
   const calculateEndpointsByTag = (swaggerData) => {
@@ -60,6 +59,25 @@ export default function Home() {
 
   const handleInputChange = (param, value) => {
     setInputFields((prev) => ({ ...prev, [param]: value }));
+  };
+
+  const handleInputSubmit = async () => {
+    if (!selectedEndpoint) return;
+
+    let finalUrl = selectedEndpoint.path;
+    Object.keys(inputFields).forEach((param) => {
+      finalUrl = finalUrl.replace(`{${param}}`, inputFields[param]);
+    });
+
+    try {
+      const response = await fetch(finalUrl, { method: selectedEndpoint.method });
+      const data = await response.json();
+      setApiResponse(data);
+    } catch (error) {
+      setApiResponse({ error: "Gagal mengambil data. Periksa kembali input yang dimasukkan." });
+    }
+
+    setShowInput(false);
   };
 
   return (
@@ -128,11 +146,21 @@ export default function Home() {
                 <p className="no-input">Endpoint ini tidak memerlukan input.</p>
               )}
               <div className="button-group">
+                <button className="submit-btn" onClick={handleInputSubmit}>
+                  Kirim
+                </button>
                 <button className="close-btn" onClick={() => setShowInput(false)}>
                   Tutup
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {apiResponse && (
+          <div className="response-box">
+            <h3>Hasil Response</h3>
+            <pre>{JSON.stringify(apiResponse, null, 2)}</pre>
           </div>
         )}
       </main>
@@ -162,32 +190,6 @@ export default function Home() {
           margin-top: 10px;
         }
 
-        .api-endpoint {
-          background: #2c2c5a;
-          border-radius: 10px;
-          padding: 12px;
-          margin-top: 15px;
-        }
-
-        .api-endpoint-header {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          font-size: 16px;
-        }
-
-        .api-endpoint-method {
-          font-weight: bold;
-          padding: 4px 8px;
-          border-radius: 4px;
-          color: white;
-        }
-
-        .api-endpoint-method.get { background: #28a745; }
-        .api-endpoint-method.post { background: #007bff; }
-        .api-endpoint-method.put { background: #ffc107; color: black; }
-        .api-endpoint-method.delete { background: #dc3545; }
-
         .modal {
           position: fixed;
           top: 0;
@@ -209,17 +211,6 @@ export default function Home() {
           text-align: center;
         }
 
-        .input-group {
-          margin-bottom: 12px;
-          text-align: left;
-        }
-
-        .input-group label {
-          display: block;
-          font-size: 14px;
-          margin-bottom: 4px;
-        }
-
         .input-group input {
           width: 100%;
           padding: 10px;
@@ -227,6 +218,22 @@ export default function Home() {
           border-radius: 6px;
           background: #3a2351; /* Warna ungu gelap */
           color: white;
+        }
+
+        .button-group {
+          margin-top: 10px;
+          display: flex;
+          gap: 10px;
+          justify-content: center;
+        }
+
+        .submit-btn {
+          background: #28a745;
+          color: white;
+          padding: 8px 16px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
         }
 
         .close-btn {
@@ -237,7 +244,13 @@ export default function Home() {
           border-radius: 6px;
           cursor: pointer;
         }
-      `}</style>
+  .response-box {
+    background: #2c2c5a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 40px; /* Tambah jarak dari endpoint */
+  }
+  `}</style>
     </>
   );
 }
