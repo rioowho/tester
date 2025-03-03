@@ -57,11 +57,11 @@ export default function Home() {
     return { ...swaggerConfig, paths: filteredPaths };
   };
 
-  useEffect(() => {
+useEffect(() => {
     const style = document.createElement("style");
     style.innerHTML = `
       body {
-        background-color: #1e1e30;
+        background-color: #191932; /* Lebih gelap agar teks lebih jelas */
         color: #ffffff;
         font-family: 'Inter', sans-serif;
       }
@@ -73,20 +73,20 @@ export default function Home() {
       }
 
       .swagger-ui .info p {
-        color: #e0e0ff !important;
+        color: #ffffff !important;
       }
 
       .swagger-ui .topbar {
-        background: linear-gradient(135deg, #29294d, #2e2e5a);
+        background: #22224a;
         padding: 15px;
         border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
       }
 
       /* Kategori API */
       .api-category {
-        background: #31315a;
-        border: 1px solid #44448a;
+        background: #24244a;
+        border: 1px solid #3c3c7a;
         padding: 16px;
         margin-bottom: 12px;
         border-radius: 10px;
@@ -95,7 +95,7 @@ export default function Home() {
       }
 
       .api-category:hover {
-        background: #3a3a7a;
+        background: #303060;
       }
 
       .api-category-header {
@@ -118,7 +118,7 @@ export default function Home() {
 
       /* Tombol */
       .swagger-ui button {
-        background: linear-gradient(135deg, #4f46e5, #6a5acd);
+        background: #5f5fcd;
         color: white;
         padding: 10px 16px;
         border-radius: 8px;
@@ -127,14 +127,14 @@ export default function Home() {
       }
 
       .swagger-ui button:hover {
-        background: linear-gradient(135deg, #6a5acd, #8a2be2);
+        background: #7676e0;
       }
 
       /* Input dan Textarea */
       .swagger-ui input, .swagger-ui textarea {
         background-color: #2d2d55;
         color: #fff;
-        border: 1px solid #5555aa;
+        border: 1px solid #7777cc;
         border-radius: 8px;
         padding: 10px;
       }
@@ -142,14 +142,14 @@ export default function Home() {
       /* Endpoint Card */
       .api-endpoint {
         background: #29294d;
-        border: 1px solid #3c3c7a;
+        border: 1px solid #4a4a8a;
         padding: 14px;
         border-radius: 10px;
         margin-bottom: 10px;
       }
 
       .api-endpoint:hover {
-        border-color: #5c5cff;
+        border-color: #6c6cff;
       }
 
       .api-endpoint-header {
@@ -170,11 +170,29 @@ export default function Home() {
 
       .api-endpoint-path {
         font-weight: 600;
-        color: #ffffff;
+        color: #f8f8ff;
       }
 
       /* Teks dalam API kategori */
       .api-category-content p {
+        color: #ffffff !important;
+      }
+
+      /* Memperjelas teks di Swagger UI */
+      .swagger-ui .opblock-summary-description {
+        color: #ffffff !important;
+      }
+
+      .swagger-ui .opblock-summary-method {
+        font-weight: bold;
+        color: #ffffff !important;
+      }
+
+      .swagger-ui .opblock-summary-path {
+        color: #f8f8ff !important;
+      }
+
+      .swagger-ui .response-col_status {
         color: #ffffff !important;
       }
     `;
