@@ -46,7 +46,7 @@ export default function Home() {
         <meta name="description" content="VelynApi is a free, simple REST API." />
       </Head>
 
-      <main className={`min-h-screen flex flex-col items-center justify-center ${inter.className}`} style={{ backgroundColor: "#0d0d1a", color: "white" }}>
+      <main className={`min-h-screen flex flex-col items-center ${inter.className}`} style={{ backgroundColor: "#0d0d1a", color: "white" }}>
         <Analytics />
         <SpeedInsights />
 
@@ -62,7 +62,8 @@ export default function Home() {
                   className={`category-button ${selectedCategory === category.name ? "active" : ""}`}
                   onClick={() => setSelectedCategory(category.name)}
                 >
-                  {category.name} ({category.count})
+                  {category.name} {category.count} endpoint
+                  <span className="arrow">{selectedCategory === category.name ? "▲" : "▶"}</span>
                 </button>
               ))
             ) : (
@@ -104,29 +105,39 @@ export default function Home() {
         }
         .category-container {
           display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
+          flex-direction: column;
+          gap: 15px;
           justify-content: center;
+          align-items: center;
           margin-bottom: 20px;
         }
         .category-button {
-          background: #5a0ca3;
-          padding: 12px 24px;
+          width: 80%;
+          background: #181842;
+          padding: 15px 20px;
           border-radius: 8px;
           color: white;
-          font-size: 16px;
+          font-size: 18px;
+          font-weight: bold;
           border: none;
           cursor: pointer;
           transition: 0.3s ease-in-out;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
           box-shadow: 0 4px 6px rgba(90, 12, 163, 0.4);
         }
         .category-button:hover {
-          background: #6a0dad;
+          background: #20205a;
           transform: scale(1.05);
         }
         .category-button.active {
-          background: #4a0c83;
+          background: #251d6d;
           box-shadow: 0 6px 10px rgba(74, 12, 131, 0.5);
+        }
+        .arrow {
+          font-size: 20px;
+          font-weight: bold;
         }
         .swagger-container {
           margin-top: 20px;
