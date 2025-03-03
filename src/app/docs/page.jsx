@@ -157,8 +157,8 @@ export default function Home() {
                 <p className="no-input">Endpoint ini tidak memerlukan input.</p>
               )}
               <div className="modal-buttons">
-                <button className="transparent-btn" onClick={() => setShowInput(false)}>Tutup</button>
-                <button className="transparent-btn" onClick={handleApiRequest}>Kirim</button>
+                <button className="floating-btn" onClick={() => setShowInput(false)}>Tutup</button>
+                <button className="floating-btn" onClick={handleApiRequest}>Kirim</button>
               </div>
             </div>
           </div>
@@ -179,51 +179,30 @@ export default function Home() {
           padding: 20px;
         }
 
-        .api-category {
-          background: linear-gradient(135deg, #4c6ef5, #6574cd);
-          padding: 16px;
-          border-radius: 12px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          cursor: pointer;
-          margin-bottom: 10px;
-          transition: all 0.3s ease-in-out;
-          color: white;
+        .api-endpoint-method {
+          font-weight: bold;
+          margin-right: 10px;
+          padding: 5px 10px;
+          border-radius: 5px;
         }
 
-        .api-category:hover {
-          background: #5050a1;
-        }
+        .get { background-color: blue; color: white; }
+        .post { background-color: green; color: white; }
 
-        .response-text {
-          word-wrap: break-word;
-          white-space: pre-wrap;
-          max-width: 100%;
-          overflow-x: auto;
-        }
-
-        .modal-content .input-group {
-          margin-bottom: 12px;
-        }
-
-        .modal-buttons {
-          display: flex;
-          justify-content: space-between;
-          margin-top: 10px;
-        }
-
-        .transparent-btn {
-          background: transparent;
-          border: 1px solid white;
+        .floating-btn {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background: #ff5722;
           color: white;
           padding: 10px 15px;
+          border-radius: 50px;
+          border: none;
           cursor: pointer;
-          border-radius: 8px;
         }
 
-        .transparent-btn:hover {
-          background: rgba(255, 255, 255, 0.2);
+        .floating-btn:hover {
+          background: #e64a19;
         }
       `}</style>
     </>
