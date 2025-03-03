@@ -71,41 +71,38 @@ export default function Home() {
   };
 
   const handleApiRequest = async (endpoint) => {
-    setApiResponse(null);
+  setApiResponse(null);
 
-    if (!endpoint.serverUrl) {
-      setApiResponse({ error: "Base URL tidak ditemukan di swaggerConfig" });
-      return;
-    }
+  const baseUrl = swaggerConfig.servers.[0].url;
 
-    let url = `${endpoint.serverUrl}${endpoint.path}`;
-    const method = endpoint.method;
+  if (!baseUrl) {
+    setApiResponse({ error: "Base URL tidak ditemukan di swaggerConfig" });
+    return;
+  }
 
-    const headers = { "Content-Type": "application/json" };
+  let url = `${baseUrl}${endpoint.path}`;
+  const method = endpoint.method;
+  const headers = { "Content-Type": "application/json" };
 
-    if (method === "GET") {
-      // Ambil parameter query yang tidak kosong
-      const queryParams = new URLSearchParams(
-        Object.fromEntries(
-          Object.entries(inputFields).filter(([_, value]) => value.trim() !== "")
-        )
-      ).toString();
+  if (method === "GET") {
+    // Buat parameter query
+    const queryParams = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries(inputFields).filter(([_, value]) => value.trim() !== "")
+      )
+    ).toString();
+    
+    if (queryParams) url += `?${queryParams}`;
+  }
 
-      if (queryParams) url += `?${queryParams}`;
-    }
-
-    try {
-      const response = await fetch(url, {
-        method,
-        headers,
-      });
-
-      const result = await response.json();
-      setApiResponse(result);
-    } catch (error) {
-      setApiResponse({ error: "Gagal mengambil data dari API" });
-    }
-  };
+  try {
+    const response = await fetch(url, { method, headers });
+    const result = await response.json();
+    setApiResponse(result);
+  } catch (error) {
+    setApiResponse({ error: "Gagal mengambil data dari API" });
+  }
+};
 
   return (
     <>
