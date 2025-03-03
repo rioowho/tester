@@ -9,7 +9,7 @@ export default function Home() {
   const [expandedTag, setExpandedTag] = useState(null);
   const [totalEndpoints, setTotalEndpoints] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [inputData, setInputData] = useState("");
+  const [inputFields, setInputFields] = useState({});
   const [selectedEndpoint, setSelectedEndpoint] = useState(null);
   const [apiResponse, setApiResponse] = useState(null);
   const [showInput, setShowInput] = useState(false);
@@ -37,6 +37,7 @@ export default function Home() {
               method: method.toUpperCase(),
               path,
               description: operation.summary || "Deskripsi tidak tersedia",
+              parameters: operation.parameters || [],
             });
           });
         }
@@ -49,10 +50,27 @@ export default function Home() {
     setExpandedTag(expandedTag === tag ? null : tag);
   };
 
-  const handleInputSubmit = async () => {
-    if (!inputData || !selectedEndpoint) return;
+  const openInputModal = (endpoint) => {
+    const defaultInputs = {};
+    endpoint.parameters.forEach((param) => {
+      defaultInputs[param.name] = "";
+    });
+    setInputFields(defaultInputs);
+    setSelectedEndpoint(endpoint);
+    setShowInput(true);
+  };
 
-    const finalUrl = selectedEndpoint.path.replace("{input}", inputData); // Ganti {input} dengan data user
+  const handleInputChange = (param, value) => {
+    setInputFields((prev) => ({ ...prev, [param]: value }));
+  };
+
+  const handleInputSubmit = async () => {
+    if (!selectedEndpoint) return;
+
+    let finalUrl = selectedEndpoint.path;
+    Object.keys(inputFields).forEach((param) => {
+      finalUrl = finalUrl.replace(`{${param}}`, inputFields[param]);
+    });
 
     try {
       const response = await fetch(finalUrl, { method: selectedEndpoint.method });
@@ -70,8 +88,6 @@ export default function Home() {
       </Head>
       <main className="container">
         <h1 className="title">VelynAPI Documentation</h1>
-
-        {/* Menampilkan total endpoint */}
         <p className="total-endpoints">Total API Endpoint: {totalEndpoints}</p>
 
         {loading ? (
@@ -79,18 +95,14 @@ export default function Home() {
         ) : (
           Object.keys(endpointsByTag).map((tag) => (
             <div key={tag} className="category-wrapper">
-              {/* Kategori API */}
               <div className="api-category" onClick={() => toggleCategory(tag)}>
-                <div className="api-category-header">
-                  <span>{tag.toUpperCase()}</span>
-                  <span className="category-count">{endpointsByTag[tag].length} endpoint</span>
-                  <span className="icon">
-                    {expandedTag === tag ? <FaChevronDown /> : <FaChevronRight />}
-                  </span>
-                </div>
+                <span>{tag.toUpperCase()}</span>
+                <span className="category-count">{endpointsByTag[tag].length} endpoint</span>
+                <span className="icon">
+                  {expandedTag === tag ? <FaChevronDown /> : <FaChevronRight />}
+                </span>
               </div>
 
-              {/* Daftar Endpoint (Tampil jika kategori diklik) */}
               {expandedTag === tag && (
                 <div className="endpoints-container">
                   {endpointsByTag[tag].map((endpoint, index) => (
@@ -102,10 +114,7 @@ export default function Home() {
                         <span className="endpoint-path">{endpoint.path}</span>
                         <span
                           className="endpoint-link"
-                          onClick={() => {
-                            setShowInput(true);
-                            setSelectedEndpoint(endpoint);
-                          }}
+                          onClick={() => openInputModal(endpoint)}
                           title="Masukkan data untuk endpoint ini"
                         >
                           <FaExternalLinkAlt />
@@ -120,24 +129,35 @@ export default function Home() {
           ))
         )}
 
-        {/* Form Input Data */}
-        {showInput && (
+        {showInput && selectedEndpoint && (
           <div className="modal">
             <div className="modal-content">
               <h3>Masukkan Data untuk Endpoint</h3>
-              <input
-                type="text"
-                placeholder="Masukkan teks atau parameter"
-                value={inputData}
-                onChange={(e) => setInputData(e.target.value)}
-              />
-              <button onClick={handleInputSubmit}>Kirim</button>
-              <button onClick={() => setShowInput(false)}>Tutup</button>
+              {selectedEndpoint.parameters.length > 0 ? (
+                selectedEndpoint.parameters.map((param) => (
+                  <div key={param.name}>
+                    <label>{param.name}:</label>
+                    <input
+                      type="text"
+                      placeholder={`Masukkan ${param.name}`}
+                      value={inputFields[param.name]}
+                      onChange={(e) => handleInputChange(param.name, e.target.value)}
+                    />
+                  </div>
+                ))
+              ) : (
+                <p>Endpoint ini tidak memerlukan input.</p>
+              )}
+              <button className="submit-btn" onClick={handleInputSubmit}>
+                Kirim
+              </button>
+              <button className="close-btn" onClick={() => setShowInput(false)}>
+                Tutup
+              </button>
             </div>
           </div>
         )}
 
-        {/* Menampilkan hasil API */}
         {apiResponse && (
           <div className="api-response">
             <h3>Hasil API:</h3>
@@ -146,80 +166,35 @@ export default function Home() {
         )}
       </main>
 
-      {/* CSS Styling */}
       <style jsx>{`
-        body {
-          background-color: #0d0d1f;
-          color: #ffffff;
-          font-family: 'Inter', sans-serif;
-        }
-
         .container {
           max-width: 600px;
           margin: auto;
           padding: 20px;
         }
 
-        .title {
-          font-size: 24px;
-          font-weight: bold;
-          text-align: center;
-          margin-bottom: 10px;
-        }
-
-        .total-endpoints {
-          font-size: 18px;
-          font-weight: bold;
-          text-align: center;
-          color: #dddddd;
-          margin-bottom: 20px;
-        }
-
-        .loading-text {
-          text-align: center;
-          font-size: 16px;
-          color: #cccccc;
-        }
-
         .api-category {
-          background: #16163a;
+          background: #1e1e40;
           border-radius: 12px;
           padding: 16px;
           display: flex;
           justify-content: space-between;
           align-items: center;
           cursor: pointer;
-          transition: all 0.3s ease;
-          text-transform: uppercase;
-          font-weight: bold;
-          font-size: 16px;
-        }
-
-        .api-category:hover {
-          background: #21214d;
         }
 
         .endpoints-container {
-          padding: 10px 15px;
-          background: #1e1e40;
+          padding: 10px;
+          background: #22224a;
           border-radius: 8px;
           margin-top: 5px;
         }
 
         .api-endpoint {
-          background: #22224a;
+          background: #2c2c5a;
           border-radius: 10px;
           padding: 12px;
           margin-top: 10px;
-          display: flex;
-          justify-content: space-between;
-        }
-
-        .endpoint-link {
-          color: #00bfff;
-          cursor: pointer;
-          margin-left: 10px;
-          font-size: 14px;
         }
 
         .modal {
@@ -235,17 +210,18 @@ export default function Home() {
         }
 
         .modal-content {
-          background: #22224a;
+          background: #1e1e40;
           padding: 20px;
           border-radius: 10px;
           text-align: center;
         }
 
-        .api-response {
-          margin-top: 20px;
-          background: #1e1e40;
+        .submit-btn {
+          background: #00bfff;
           padding: 10px;
-          border-radius: 8px;
+          border-radius: 5px;
+          color: white;
+          font-weight: bold;
         }
       `}</style>
     </>
