@@ -97,21 +97,21 @@ export default function Home() {
     font-size: 24px;
     font-weight: bold;
     text-align: center;
-    margin-bottom: 10px; /* Diperpendek jarak */
+    margin-bottom: 5px; /* Jarak lebih dekat */
   }
   .category-container {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Jarak kategori sedikit dirapatkan */
+    gap: 8px; /* Jarak antar kategori */
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
-    margin-top: 5px; /* Kategori lebih dekat ke total endpoints */
+    margin-top: 2px; /* Kategori lebih dekat ke total endpoints */
   }
   .category-button {
     width: 80%;
     background: #181842;
-    padding: 15px 20px;
+    padding: 14px 18px;
     border-radius: 8px;
     color: white;
     font-size: 18px;
