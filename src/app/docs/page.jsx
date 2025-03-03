@@ -16,16 +16,17 @@ export default function Home() {
   const [totalEndpoints, setTotalEndpoints] = useState(0);
 
   useEffect(() => {
-    console.log("Swagger Config Loaded:", swaggerConfig);
-
-    // Menghitung total endpoint
+    // Menghitung total endpoint dari swaggerConfig
+    let count = 0;
     if (swaggerConfig.paths) {
-      setTotalEndpoints(Object.keys(swaggerConfig.paths).length);
+      count = Object.keys(swaggerConfig.paths).length;
     }
+    setTotalEndpoints(count);
   }, []);
 
-  // Ambil kategori API dari `tags`
-  const categories = swaggerConfig.tags || [];
+  const categories = Object.keys(swaggerConfig.tags || {}).map((tag) => ({
+    name: tag,
+  }));
 
   return (
     <>
@@ -48,54 +49,67 @@ export default function Home() {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
 
-      <main className={`min-h-screen flex flex-col items-center justify-center ${inter.className}`} style={{ backgroundColor: "#0d0d1a", color: "white" }}>
-        <Analytics />
-        <SpeedInsights />
+      <main className={`min-h-screen flex flex-col items-center justify-center ${inter.className}`} style={{ backgroundColor: "#0d0d1a", color: "white" }}>  
+        <Analytics />  
+        <SpeedInsights />  
 
-        <div className="container">
-          <h1 style={{ fontSize: "24px", fontWeight: "bold", textAlign: "center", marginBottom: "20px" }}>
-            Total Endpoints: {totalEndpoints}
-          </h1>
+        <div className="container">  
+          <h1 style={{ fontSize: "24px", fontWeight: "bold", textAlign: "center", marginBottom: "20px" }}>  
+            Total Endpoints: {totalEndpoints}  
+          </h1>  
 
-          {/* Tombol kategori API */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "center", marginBottom: "20px" }}>
-            {categories.map((category, index) => (
-              <button
-                key={index}
-                className="category-button"
-                onClick={() => setSelectedCategory(category.name)}
-                style={{
-                  background: selectedCategory === category.name ? "#5a0ca3" : "#6a0dad",
-                  padding: "10px 20px",
-                  borderRadius: "8px",
-                  color: "white",
-                  fontSize: "16px",
-                  border: "none",
-                  cursor: "pointer",
-                  transition: "0.3s",
-                }}
-              >
-                {category.name}
-              </button>
-            ))}
-          </div>
+          {/* Tombol kategori API */}  
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "center", marginBottom: "20px" }}>  
+            {categories.map((category, index) => (  
+              <button  
+                key={index}  
+                className="category-button"  
+                onClick={() => setSelectedCategory(category.name)}  
+                style={{  
+                  background: selectedCategory === category.name ? "#5a0ca3" : "#6a0dad",  
+                  padding: "10px 20px",  
+                  borderRadius: "8px",  
+                  color: selectedCategory === category.name ? "#5a0ca3" : "#f0f0f0",  // Dark purple when selected
+                  fontSize: "16px",  
+                  border: "none",  
+                  cursor: "pointer",  
+                  transition: "0.3s",  
+                }}  
+              >  
+                {category.name}  
+              </button>  
+            ))}  
+          </div>  
 
-          {selectedCategory && (
-            <div className="card">
-              <SwaggerUI
-                spec={{
-                  ...swaggerConfig,
-                  paths: Object.fromEntries(
-                    Object.entries(swaggerConfig.paths).filter(([_, value]) =>
-                      value.tags && value.tags.includes(selectedCategory)
-                    )
-                  ),
-                }}
-              />
-            </div>
-          )}
-        </div>
-      </main>
+          {/* Swagger UI hanya muncul jika kategori dipilih */}  
+          {selectedCategory && (  
+            <div className="card">  
+              <SwaggerUI  
+                spec={{  
+                  ...swaggerConfig,  
+                  paths: Object.fromEntries(  
+                    Object.entries(swaggerConfig.paths).filter(([_, value]) =>  
+                      value.tags.includes(selectedCategory)  
+                    )  
+                  ),  
+                }}  
+              />  
+            </div>  
+          )}  
+        </div>  
+      </main>  
+
+      {/* CSS-in-JS for category-button */}
+      <style jsx>{`
+        .category-button {
+          transition: background-color 0.3s, color 0.3s;
+        }
+
+        .category-button:hover {
+          background-color: #5a0ca3;
+          color: white;
+        }
+      `}</style>
     </>
   );
 }
