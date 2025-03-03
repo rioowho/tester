@@ -3,8 +3,8 @@ import Head from "next/head";
 import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
 import { useEffect, useState } from "react";
-import { FaChevronDown, FaChevronRight } from "react-icons/fa"; // Import icon dari react-icons
-import swaggerConfig from "../swagger-config.json"; // Sesuaikan path ini dengan file swagger-config.json Anda
+import { FaChevronDown, FaChevronRight } from "react-icons/fa";
+import swaggerConfig from "../swagger-config.json";
 
 export default function Home() {
   const [endpointsByTag, setEndpointsByTag] = useState({});
@@ -57,135 +57,135 @@ export default function Home() {
       });
     });
 
-    return {
-      ...swaggerConfig,
-      paths: filteredPaths,
+    return {  
+      ...swaggerConfig,  
+      paths: filteredPaths,  
     };
   };
 
   useEffect(() => {
     const style = document.createElement("style");
     style.innerHTML = `
-      body {
-        background-color: #181818;
-        color: #e0e0e0;
-        font-family: 'Roboto', sans-serif;
-      }
+    body {
+      background-color: #0d1117;
+      color: #c9d1d9;
+      font-family: 'Inter', sans-serif;
+    }
 
-      .swagger-ui .info .title,
-      .swagger-ui .opblock-summary-method,
-      .swagger-ui .opblock-summary-path,
-      .swagger-ui .model-title {
-        color: #ffffff !important;
-      }
+    .swagger-ui .info .title,
+    .swagger-ui .opblock-summary-method,
+    .swagger-ui .opblock-summary-path,
+    .swagger-ui .model-title {
+      color: #ffffff !important;
+    }
 
-      .swagger-ui .topbar {
-        background-color: #242424;
-        padding: 10px 20px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      }
+    .swagger-ui .topbar {
+      background-color: #161b22;
+      padding: 12px 24px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+    }
 
-      /* API Category Styling */
-      .api-category {
-        background-color: #1e1e1e;
-        border: 1px solid #444;
-        padding: 16px;
-        margin-bottom: 16px;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
+    .swagger-ui .topbar a {
+      color: #58a6ff;
+      font-weight: bold;
+      text-decoration: none;
+    }
 
-      .api-category:hover {
-        background-color: #2a2a2a;
-        border-color: #555;
-      }
+    .api-category {
+      background-color: #161b22;
+      border: 1px solid #30363d;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
 
-      .api-category-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 18px;
-        font-weight: bold;
-        color: #f0f0f0;
-      }
+    .api-category:hover {
+      background-color: #21262d;
+      border-color: #484f58;
+    }
 
-      .api-category-content {
-        display: none;
-        padding-top: 12px;
-      }
+    .api-category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #f0f6fc;
+    }
 
-      .api-category.expanded .api-category-content {
-        display: block;
-      }
+    .api-category-content {
+      display: none;
+      padding-top: 12px;
+    }
 
-      .api-category-header .icon {
-        margin-left: 10px;
-        font-size: 20px;
-        color: #cccccc;
-        transition: transform 0.3s ease;
-      }
+    .api-category.expanded .api-category-content {
+      display: block;
+    }
 
-      .api-category.expanded .api-category-header .icon {
-        transform: rotate(180deg);
-      }
+    .api-category-header .icon {
+      margin-left: 10px;
+      font-size: 20px;
+      color: #8b949e;
+      transition: transform 0.3s ease;
+    }
 
-      /* Card-like API endpoint */
-      .api-endpoint {
-        background-color: #242424;
-        border: 1px solid #333;
-        padding: 12px 16px;
-        border-radius: 8px;
-        margin-bottom: 10px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-      }
+    .api-category.expanded .api-category-header .icon {
+      transform: rotate(180deg);
+    }
 
-      .api-endpoint:hover {
-        border-color: #555;
-      }
+    .api-endpoint {
+      background-color: #0d1117;
+      border: 1px solid #30363d;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    }
 
-      .api-endpoint-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 16px;
-      }
+    .api-endpoint:hover {
+      border-color: #484f58;
+    }
 
-      .api-endpoint-method {
-        font-weight: bold;
-        color: #ffa500; /* Or your preferred primary color */
-      }
+    .api-endpoint-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+    }
 
-      .api-endpoint-path {
-        font-weight: 600;
-        color: #ffffff;
-      }
+    .api-endpoint-method {
+      font-weight: bold;
+      color: #ff7b72;
+    }
 
-      /* Adjust input and button styling for dark theme */
-      .swagger-ui input[type="text"],
-      .swagger-ui input[type="password"],
-      .swagger-ui select,
-      .swagger-ui textarea {
-        background-color: #2a2a2a;
-        color: #ffffff;
-        border-color: #444;
-        border-radius: 6px;
-      }
+    .api-endpoint-path {
+      font-weight: 600;
+      color: #f0f6fc;
+    }
 
-      .swagger-ui button {
-        background-color: #ff7f50; /* Button color */
-        color: white;
-        border-radius: 6px;
-      }
+    .swagger-ui input[type="text"],
+    .swagger-ui input[type="password"],
+    .swagger-ui select,
+    .swagger-ui textarea {
+      background-color: #161b22;
+      color: #f0f6fc;
+      border-color: #30363d;
+      border-radius: 6px;
+    }
 
-      .swagger-ui button:hover {
-        background-color: #ff9c68; /* Hover state */
-      }
+    .swagger-ui button {
+      background-color: #238636;
+      color: white;
+      border-radius: 6px;
+    }
 
-      /* Adjust footer or extra info */
-      .swagger-ui .info .base-url {
-        color: #cccccc;
-      }
+    .swagger-ui button:hover {
+      background-color: #2ea043;
+    }
     `;
     document.head.appendChild(style);
     return () => {
@@ -196,34 +196,17 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>VelynAPI</title>
+        <title>VelynAPI - Dokumentasi</title>
         <meta name="title" content="VelynAPI - Dokumentasi" />
-        <meta
-          name="description"
-          content="VelynApi adalah REST API gratis dan sederhana yang dibuat oleh ErerexIDChx untuk kebaikan bersama. Silakan gunakan, tapi hindari serangan DDoS."
-        />
-        <meta
-          name="keywords"
-          content="REST API, KyuuRzy, Siputzx, Qanypaw, Nawdev, Itzpire API, free API, dokumentasi API, bot wa, REST API gratis"
-        />
+        <meta name="description" content="Dokumentasi lengkap VelynAPI yang menyediakan berbagai layanan API gratis." />
+        <meta name="keywords" content="API, VelynAPI, Dokumentasi API, Free API, AI API" />
         <meta name="robots" content="index, follow" />
-        <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="language" content="English, Indonesian" />
         <meta property="og:title" content="VelynAPI - Dokumentasi" />
-        <meta
-          property="og:description"
-          content="VelynApi adalah REST API gratis dan sederhana yang dibuat oleh ErerexIDChx untuk kebaikan bersama. Silakan gunakan, tapi hindari serangan DDoS."
-        />
-        <meta property="og:url" content="https://kyuubeyours.us.kg" />
+        <meta property="og:description" content="Dokumentasi lengkap VelynAPI yang menyediakan berbagai layanan API gratis." />
+        <meta property="og:url" content="https://velynapi.com" />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://files.catbox.moe/962uqd.jpg" />
-        <meta name="twitter:title" content="VelynAPI - Dokumentasi" />
-        <meta
-          name="twitter:description"
-          content="VelynApi adalah REST API gratis dan sederhana yang dibuat oleh ErerexIDChx untuk kebaikan bersama. Silakan gunakan, tapi hindari serangan DDoS."
-        />
-        <meta name="twitter:image" content="https://files.catbox.moe/962uqd.jpg" />
-        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="og:image" content="https://your-image-url.com/logo.png" />
       </Head>
 
       <main className={`p-6`}>
@@ -232,35 +215,15 @@ export default function Home() {
             <p>Memuat endpoint...</p>
           ) : (
             Object.keys(endpointsByTag).map((tag) => (
-              <div
-                key={tag}
-                className={`api-category ${expandedTag === tag ? "expanded" : ""}`}
-              >
-                <div className="api-category-header">
+              <div key={tag} className={`api-category ${expandedTag === tag ? "expanded" : ""}`}>
+                <div className="api-category-header" onClick={() => toggleCategory(tag)}>
                   <span>{`# ${tag.toUpperCase()}`}</span>
-                  <span>{`${endpointsByTag[tag].length} endpoint`}</span>
-                  <span
-                    className="icon"
-                    onClick={(e) => {
-                      // Hentikan propagasi event untuk menghentikan interaksi dengan SwaggerUI
-                      e.stopPropagation();
-                      toggleCategory(tag);
-                    }}
-                  >
-                    {expandedTag === tag ? (
-                      <FaChevronDown /> // Ikon ketika diperluas
-                    ) : (
-                      <FaChevronRight /> // Ikon ketika dilipat
-                    )}
+                  <span className="icon">
+                    {expandedTag === tag ? <FaChevronDown /> : <FaChevronRight />}
                   </span>
                 </div>
                 <div className="api-category-content">
-                  {expandedTag === tag && (
-                    <SwaggerUI
-                      key={tag} // Menggunakan tag sebagai key untuk memastikan render ulang
-                      spec={getFilteredSpec(tag)}
-                    />
-                  )}
+                  {expandedTag === tag && <SwaggerUI key={tag} spec={getFilteredSpec(tag)} />}
                 </div>
               </div>
             ))
