@@ -17,10 +17,7 @@ export default function Home() {
     const endpointsMap = calculateEndpointsByTag(swaggerConfig);
     setEndpointsByTag(endpointsMap);
     setTotalEndpoints(
-      Object.values(endpointsMap).reduce(
-        (sum, endpoints) => sum + endpoints.length,
-        0
-      )
+      Object.values(endpointsMap).reduce((sum, endpoints) => sum + endpoints.length, 0)
     );
     setLoading(false);
   }, []);
@@ -64,7 +61,7 @@ export default function Home() {
     setInputFields((prev) => ({ ...prev, [param]: value }));
   };
 
-  const handleApiRequest = async (method) => {
+  const handleApiRequest = async () => {
     if (!selectedEndpoint) return;
 
     let finalUrl = selectedEndpoint.path;
@@ -73,11 +70,11 @@ export default function Home() {
     });
 
     const options = {
-      method: method,
+      method: selectedEndpoint.method,
       headers: { "Content-Type": "application/json" },
     };
 
-    if (method === "POST") {
+    if (selectedEndpoint.method === "POST") {
       options.body = JSON.stringify(inputFields);
     }
 
@@ -109,7 +106,7 @@ export default function Home() {
               <div className="api-category" onClick={() => toggleCategory(tag)}>
                 <span>{tag.toUpperCase()}</span>
                 <span className="category-count">{endpointsByTag[tag].length} endpoints</span>
-                <span className="icon">{expandedTag === tag ? "<" : ">"}</span>
+                <span className="icon">{expandedTag === tag ? "▼" : "▶"}</span>
               </div>
 
               {expandedTag === tag && (
@@ -122,10 +119,10 @@ export default function Home() {
                         </span>
                         <span className="endpoint-path">{endpoint.path}</span>
                         <button
-                          className={`endpoint-btn ${endpoint.method.toLowerCase()}`}
+                          className="endpoint-btn"
                           onClick={() => openInputModal(endpoint)}
                         >
-                          {endpoint.method === "GET" ? "GET Data" : ">"}
+                          ➜
                         </button>
                       </div>
                       <p className="endpoint-description">{endpoint.description}</p>
@@ -156,17 +153,9 @@ export default function Home() {
               ) : (
                 <p className="no-input">Endpoint ini tidak memerlukan input.</p>
               )}
-              <div className="button-group">
-                <button className="submit-btn purple-btn" onClick={() => handleApiRequest("GET")}>
-                  Kirim GET
-                </button>
-                <button className="submit-btn purple-btn" onClick={() => handleApiRequest("POST")}>
-                  Kirim POST
-                </button>
-                <button className="close-btn" onClick={() => setShowInput(false)}>
-                  Tutup
-                </button>
-              </div>
+              <button className="floating-btn" onClick={handleApiRequest}>
+                ➤ Kirim
+              </button>
             </div>
           </div>
         )}
@@ -187,39 +176,44 @@ export default function Home() {
         }
 
         .api-category {
-          background: #292952;
-          padding: 18px;
+          background: #3a3a6e;
+          padding: 16px;
           border-radius: 12px;
           display: flex;
           justify-content: space-between;
           align-items: center;
           cursor: pointer;
-          margin-bottom: 15px;
+          margin-bottom: 10px;
           transition: all 0.3s ease-in-out;
         }
 
         .api-category:hover {
-          background: #3a3a6e;
-          transform: scale(1.02);
+          background: #5050a1;
         }
 
-        .api-endpoint-method {
-          font-weight: bold;
-          padding: 6px 12px;
-          border-radius: 5px;
+        .api-endpoint {
+          background: #2e2e5a;
+          padding: 10px;
+          border-radius: 8px;
+          margin-top: 8px;
         }
 
-        .get {
-          background: blue;
-        }
-
-        .post {
-          background: green;
-        }
-
-        .purple-btn {
+        .floating-btn {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
           background: #6a0dad;
           color: white;
+          padding: 12px 20px;
+          border-radius: 50px;
+          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+          cursor: pointer;
+          font-size: 16px;
+          transition: background 0.3s ease-in-out;
+        }
+
+        .floating-btn:hover {
+          background: #822adf;
         }
       `}</style>
     </>
