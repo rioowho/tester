@@ -17,7 +17,10 @@ export default function Home() {
     const endpointsMap = calculateEndpointsByTag(swaggerConfig);
     setEndpointsByTag(endpointsMap);
     setTotalEndpoints(
-      Object.values(endpointsMap).reduce((sum, endpoints) => sum + endpoints.length, 0)
+      Object.values(endpointsMap).reduce(
+        (sum, endpoints) => sum + endpoints.length,
+        0
+      )
     );
     setLoading(false);
   }, []);
@@ -61,7 +64,7 @@ export default function Home() {
     setInputFields((prev) => ({ ...prev, [param]: value }));
   };
 
-  const handleInputSubmit = async () => {
+  const handleApiRequest = async (method) => {
     if (!selectedEndpoint) return;
 
     let finalUrl = selectedEndpoint.path;
@@ -69,8 +72,17 @@ export default function Home() {
       finalUrl = finalUrl.replace(`{${param}}`, inputFields[param]);
     });
 
+    const options = {
+      method: method,
+      headers: { "Content-Type": "application/json" },
+    };
+
+    if (method === "POST") {
+      options.body = JSON.stringify(inputFields);
+    }
+
     try {
-      const response = await fetch(finalUrl, { method: selectedEndpoint.method });
+      const response = await fetch(finalUrl, options);
       const data = await response.json();
       setApiResponse(data);
     } catch (error) {
@@ -109,13 +121,12 @@ export default function Home() {
                           {endpoint.method}
                         </span>
                         <span className="endpoint-path">{endpoint.path}</span>
-                        <span
-                          className="endpoint-icon"
+                        <button
+                          className={`endpoint-btn ${endpoint.method.toLowerCase()}`}
                           onClick={() => openInputModal(endpoint)}
-                          title="Masukkan data untuk endpoint ini"
                         >
-                          {">"}
-                        </span>
+                          {endpoint.method === "GET" ? "GET Data" : "POST Data"}
+                        </button>
                       </div>
                       <p className="endpoint-description">{endpoint.description}</p>
                     </div>
@@ -146,8 +157,17 @@ export default function Home() {
                 <p className="no-input">Endpoint ini tidak memerlukan input.</p>
               )}
               <div className="button-group">
-                <button className="submit-btn" onClick={handleInputSubmit}>
-                  Kirim
+                <button
+                  className="submit-btn get-btn"
+                  onClick={() => handleApiRequest("GET")}
+                >
+                  Kirim GET
+                </button>
+                <button
+                  className="submit-btn post-btn"
+                  onClick={() => handleApiRequest("POST")}
+                >
+                  Kirim POST
                 </button>
                 <button className="close-btn" onClick={() => setShowInput(false)}>
                   Tutup
@@ -160,7 +180,7 @@ export default function Home() {
         {apiResponse && (
           <div className="response-box">
             <h3>Hasil Response</h3>
-            <pre>{JSON.stringify(apiResponse, null, 2)}</pre>
+            <pre className="response-text">{JSON.stringify(apiResponse, null, 2)}</pre>
           </div>
         )}
       </main>
@@ -183,74 +203,50 @@ export default function Home() {
           margin-bottom: 10px;
         }
 
-        .endpoints-container {
-          padding: 15px;
-          background: #22224a;
-          border-radius: 8px;
-          margin-top: 10px;
-        }
-
-        .modal {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        .modal-content {
-          background: #1e1e40;
-          padding: 20px;
-          border-radius: 10px;
-          width: 90%;
-          max-width: 400px;
-          text-align: center;
-        }
-
-        .input-group input {
-          width: 100%;
-          padding: 10px;
-          border: none;
-          border-radius: 6px;
-          background: #3a2351; /* Warna ungu gelap */
-          color: white;
-        }
-
-        .button-group {
-          margin-top: 10px;
-          display: flex;
-          gap: 10px;
-          justify-content: center;
-        }
-
-        .submit-btn {
-          background: #28a745;
-          color: white;
-          padding: 8px 16px;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-        }
-
-        .close-btn {
-          background: #dc3545;
-          color: white;
-          padding: 8px 16px;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-        }
-  .response-box {
-    background: #2c2c5a;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 40px; /* Tambah jarak dari endpoint */
+          .api-endpoint-method {
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
   }
-  `}</style>
+
+  .get {
+    background: #007bff; 
+    color: white;
+  }
+
+  .post {
+    background: #28a745; 
+    color: white;
+  }
+
+  .endpoint-btn {
+    padding: 6px 12px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .get-btn {
+    background: #007bff;
+    color: white;
+  }
+
+  .post-btn {
+    background: #28a745; 
+    color: white;
+  }
+
+        .response-box {
+          background: #2c2c5a;
+          padding: 15px;
+          border-radius: 8px;
+          margin-top: 40px;
+          overflow-x: auto;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+        }
+      `}</style>
     </>
   );
 }
