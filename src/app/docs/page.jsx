@@ -72,6 +72,13 @@ export default function Home() {
         background: #303060;
       }
 
+      .api-category-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+      }
+
       .api-category span {
         font-size: 16px;
         font-weight: bold;
@@ -82,6 +89,34 @@ export default function Home() {
         font-size: 14px;
         color: #ffffff;
       }
+
+      .api-endpoint {
+        background: #29294d;
+        border-radius: 10px;
+        padding: 12px;
+        margin-top: 8px;
+        border: 1px solid #4a4a8a;
+      }
+
+      .api-endpoint-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        color: #ffffff;
+      }
+
+      .api-endpoint-method {
+        font-weight: bold;
+        padding: 4px 8px;
+        border-radius: 6px;
+        text-transform: uppercase;
+      }
+
+      .api-endpoint-method.GET { background: #28a745; color: white; }
+      .api-endpoint-method.POST { background: #007bff; color: white; }
+      .api-endpoint-method.PUT { background: #ffc107; color: black; }
+      .api-endpoint-method.DELETE { background: #dc3545; color: white; }
     `;
     document.head.appendChild(style);
     return () => {
@@ -99,11 +134,36 @@ export default function Home() {
           <p>Memuat kategori...</p>
         ) : (
           Object.keys(endpointsByTag).map((tag) => (
-            <div key={tag} className="api-category" onClick={() => toggleCategory(tag)}>
-              <span>{tag.toUpperCase()}</span>
-              <span className="icon">
-                {expandedTag === tag ? <FaChevronDown /> : <FaChevronRight />}
-              </span>
+            <div key={tag}>
+              {/* Kategori API */}
+              <div className="api-category" onClick={() => toggleCategory(tag)}>
+                <div className="api-category-header">
+                  <span>{tag.toUpperCase()}</span>
+                  <span>{endpointsByTag[tag].length} endpoint</span>
+                  <span className="icon">
+                    {expandedTag === tag ? <FaChevronDown /> : <FaChevronRight />}
+                  </span>
+                </div>
+              </div>
+
+              {/* Daftar Endpoint (Tampil jika kategori diklik) */}
+              {expandedTag === tag && (
+                <div>
+                  {endpointsByTag[tag].map((endpoint, index) => (
+                    <div key={index} className="api-endpoint">
+                      <div className="api-endpoint-header">
+                        <span className={`api-endpoint-method ${endpoint.method}`}>
+                          {endpoint.method}
+                        </span>
+                        <span>{endpoint.path}</span>
+                      </div>
+                      <p style={{ fontSize: "12px", color: "#cccccc" }}>
+                        {endpoint.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))
         )}
