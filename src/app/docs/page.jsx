@@ -13,7 +13,6 @@ export default function Home() {
   const [inputFields, setInputFields] = useState({});
   const [apiResponse, setApiResponse] = useState(null);
 
-  // Pindahkan fungsi ke atas agar tidak terjadi error
   const calculateEndpointsByTag = (swaggerData) => {
     const tagEndpointMap = {};
     if (!swaggerData?.paths) return tagEndpointMap;
@@ -42,12 +41,8 @@ export default function Home() {
   useEffect(() => {
     const endpointsMap = calculateEndpointsByTag(swaggerConfig);
     setEndpointsByTag(endpointsMap);
-
-    // Perbaikan perhitungan total endpoints
     const total = Object.values(endpointsMap).reduce(
-      (sum, endpoints) => sum + endpoints.length,
-      0
-    );
+      (sum, endpoints) => sum + endpoints.length);
     setTotalEndpoints(total);
 
     setLoading(false);
@@ -67,8 +62,9 @@ export default function Home() {
     setShowInput(true);
   };
 
-  const closeModal = () => {
+const closeModal = () => {
   setInputFields({});
+  setApiResponse(null); 
   setShowInput(false);
 };
 
@@ -161,6 +157,7 @@ export default function Home() {
 {showInput && selectedEndpoint && (
   <div className="floating-modal">
     <div className="modal-content">
+      <button className="close-btn" onClick={closeModal}>✖</button>
       <h3>Masukkan Data</h3>
 
       {selectedEndpoint.parameters.length > 0 ? (
@@ -183,28 +180,29 @@ export default function Home() {
         <button className="bubble-button" onClick={closeModal}>Tutup</button>
         <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
       </div>
-
-      {apiResponse !== null && (
-        <div className="api-result">
-          <h3>Response Body</h3>
-          <button className="copy-btn" onClick={() => navigator.clipboard.writeText(JSON.stringify(apiResponse, null, 2))}>
-            Copy
-          </button>
-          <pre>{JSON.stringify(apiResponse, null, 2)}</pre>
-          <button className="download-btn" onClick={() => {
-            const blob = new Blob([JSON.stringify(apiResponse, null, 2)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "api_response.json";
-            a.click();
-            URL.revokeObjectURL(url);
-          }}>
-            <i className="fas fa-download"></i> Download
-          </button>
-        </div>
-      )}
     </div>
+  </div>
+)}
+
+{apiResponse !== null && (
+  <div className="api-result">
+    <h3>Response Body</h3>
+    <button className="copy-btn" onClick={() => navigator.clipboard.writeText(JSON.stringify(apiResponse, null, 2))}>
+      Copy
+    </button>
+    <pre>{JSON.stringify(apiResponse, null, 2)}</pre>
+    <button className="download-btn" onClick={() => {
+      const blob = new Blob([JSON.stringify(apiResponse, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "api_response.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }}>
+      <i className="fas fa-download"></i> Download
+    </button>
+    <button className="clear-btn" onClick={clearApiResponse}>Hapus Result</button>
   </div>
 )}
       </main>
