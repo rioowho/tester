@@ -1,7 +1,7 @@
 "use client";
-import Head from "next/head";
-import { useEffect, useState } from "react";
 import swaggerConfig from "../swagger-config.json";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function Home() {
   const [endpointsByTag, setEndpointsByTag] = useState({});
@@ -70,156 +70,146 @@ export default function Home() {
     setShowInput(false);
   };
 
-const handleApiRequest = async () => {
-  if (!selectedEndpoint) return;
-  let baseUrl = selectedEndpoint.serverUrl.replace(/\/$/, ""); // Hapus slash di akhir server URL
-  let endpointPath = selectedEndpoint.path.replace(/^\//, ""); // Hapus slash di awal path
-  let finalUrl = selectedEndpoint.path.startsWith("http")
-    ? selectedEndpoint.path
-    : `${baseUrl}/${endpointPath}`;
-  Object.keys(inputFields).forEach((param) => {
-    finalUrl = finalUrl.replace(`{${param}}`, encodeURIComponent(inputFields[param] || ""));
-  });
-  if (/\{.*?\}/.test(finalUrl)) {
-    setApiResponse({ error: "Ada parameter dalam URL yang belum diisi." });
-    return;
-  }
-  setApiResponse({ debugUrl: finalUrl, status: "Fetching..." });
+  const handleApiRequest = async () => {
+    if (!selectedEndpoint) return;
+    let baseUrl = selectedEndpoint.serverUrl.replace(/\/$/, ""); // Hapus slash di akhir server URL
+    let endpointPath = selectedEndpoint.path.replace(/^\//, ""); // Hapus slash di awal path
+    let finalUrl = selectedEndpoint.path.startsWith("http")
+      ? selectedEndpoint.path
+      : `${baseUrl}/${endpointPath}`;
 
-  try {
-    const response = await axios.get(finalUrl, {
-      headers: {
-        "Content-Type": "application/json"
+    // Menangani parameter path
+    Object.keys(inputFields).forEach((param) => {
+      finalUrl = finalUrl.replace(`{${param}}`, encodeURIComponent(inputFields[param] || ""));
+    });
+
+    // Menangani parameter query
+    const queryParams = [];
+    Object.keys(inputFields).forEach((param) => {
+      if (!finalUrl.includes(`{${param}}`)) {
+        queryParams.push(`${param}=${encodeURIComponent(inputFields[param] || "")}`);
       }
     });
 
-    setApiResponse(response.data); // Tampilkan response dari API
-  } catch (error) {
-    console.error("API Request Error:", error);
-    setApiResponse({ error: error.message || "Gagal mengambil data dari API." });
-  }
-  setInputFields({});
-};
+    if (queryParams.length > 0) {
+      finalUrl += (finalUrl.includes("?") ? "&" : "?") + queryParams.join("&");
+    }
+
+    if (/\{.*?\}/.test(finalUrl)) {
+      setApiResponse({ error: "Ada parameter dalam URL yang belum diisi." });
+      return;
+    }
+
+    setApiResponse({ debugUrl: finalUrl, status: "Fetching..." });
+
+    try {
+      const response = await axios.get(finalUrl, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      setApiResponse(response.data); // Tampilkan response dari API
+    } catch (error) {
+      console.error("API Request Error:", error);
+      setApiResponse({ error: error.message || "Gagal mengambil data dari API." });
+    }
+    setInputFields({});
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(JSON.stringify(apiResponse.data, null, 2))
+      .then(() => alert("Data berhasil disalin!"))
+      .catch((err) => console.error("Gagal menyalin: ", err));
+  };
+
+  const handleDownload = () => {
+    const blob = new Blob([JSON.stringify(apiResponse.data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "api-response.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
-    <>
-      <Head>
-        <title>API Explorer</title>
-      </Head>
-
-      <main>
+    <div>
+      {/* Your JSX Structure */}
+      <div>
         {loading ? (
-          <p className="loading-text">Memuat data...</p>
+          <p>Loading...</p>
         ) : (
-          <div>
-            <h1>Total Endpoints: {totalEndpoints}</h1>
-
-            {Object.keys(endpointsByTag).map((tag) => (
-              <div key={tag} className="category-wrapper">
-                <div className="api-category" onClick={() => toggleCategory(tag)}>
-                  {tag}
-                  <span className="icon">{expandedTag === tag ? "▼" : "▶"}</span>
-                </div>
-
-                {expandedTag === tag &&
-                  endpointsByTag[tag].map((endpoint) => (
-                    <div key={endpoint.path} className="api-endpoint">
-                      <div className="endpoint-header">
-                        <span className={`api-method ${endpoint.method.toLowerCase()}`}>
-                          {endpoint.method}
-                        </span>
-                        <span className="endpoint-path">{endpoint.path}</span>
-                        <button className="endpoint-btn" onClick={() => openInputModal(endpoint)}>
-                          ➜
-                        </button>
-                      </div>
-                      <p className="endpoint-description">{endpoint.description}</p>
+          <>
+            <h2>Total Endpoints: {totalEndpoints}</h2>
+            <div>
+              {Object.entries(endpointsByTag).map(([tag, endpoints]) => (
+                <div key={tag}>
+                  <button onClick={() => toggleCategory(tag)}>
+                    {tag}
+                  </button>
+                  {expandedTag === tag && (
+                    <div>
+                      {endpoints.map((endpoint, index) => (
+                        <div key={index}>
+                          <button onClick={() => openInputModal(endpoint)}>
+                            {endpoint.method} {endpoint.path}
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {showInput && selectedEndpoint && (
+        <div>
+          <h3>Input Parameters for {selectedEndpoint.method} {selectedEndpoint.path}</h3>
+          <form>
+            {selectedEndpoint.parameters.map((param) => (
+              <div key={param.name}>
+                <label>{param.name}</label>
+                <input
+                  type="text"
+                  value={inputFields[param.name] || ""}
+                  onChange={(e) =>
+                    setInputFields({
+                      ...inputFields,
+                      [param.name]: e.target.value
+                    })
+                  }
+                />
               </div>
             ))}
-          </div>
-        )}
+          </form>
+          <button onClick={handleApiRequest}>Kirim</button>
+          <button onClick={closeModal}>Tutup</button>
+        </div>
+      )}
 
-        {showInput && selectedEndpoint && (
-          <div className="floating-modal">
-            <div className="modal-content">
-              <h3>Masukkan Data</h3>
-
-              {selectedEndpoint.parameters.length > 0 ? (
-                selectedEndpoint.parameters.map((param) => (
-                  <div key={param.name} className="input-group">
-                    <label>{param.name}</label>
-                    <input
-                      type="text"
-                      placeholder={`Masukkan ${param.name}`}
-                      value={inputFields[param.name] || ""}
-                      onChange={(e) =>
-                        setInputFields((prev) => ({
-                          ...prev,
-                          [param.name]: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                ))
-              ) : (
-                <p className="no-input">Endpoint ini tidak memerlukan input.</p>
-              )}
-
-              <div className="floating-buttons">
-                <button className="bubble-button" onClick={closeModal}>
-                  Tutup
-                </button>
-                <button
-                  className="bubble-button"
-                  onClick={() => handleApiRequest(selectedEndpoint)}
-                >
-                  Kirim
-                </button>
-              </div>
-
-              {apiResponse !== null && (
-                <div className="api-result">
-                  <h3>Response Body</h3>
-                  <button
-                    className="copy-btn"
-                    onClick={() =>
-                      navigator.clipboard.writeText(
-                        typeof apiResponse === "object"
-                          ? JSON.stringify(apiResponse, null, 2)
-                          : apiResponse
-                      )
-                    }
-                  >
-                    Copy
-                  </button>
-
-                  <pre>{typeof apiResponse === "object" ? JSON.stringify(apiResponse, null, 2) : apiResponse}</pre>
-
-                  <button
-                    className="download-btn"
-                    onClick={() => {
-                      const blob = new Blob(
-                        [typeof apiResponse === "object" ? JSON.stringify(apiResponse, null, 2) : apiResponse],
-                        { type: "application/json" }
-                      );
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement("a");
-                      a.href = url;
-                      a.download = "api_response.json";
-                      a.click();
-                      URL.revokeObjectURL(url);
-                    }}
-                  >
-                    <i className="fas fa-download"></i> Download
-                  </button>
-                </div>
-              )}
+      {apiResponse && (
+        <div>
+          {apiResponse.debugUrl && (
+            <p>
+              <strong>Debug URL:</strong> {apiResponse.debugUrl}
+            </p>
+          )}
+          {apiResponse.status && <p>{apiResponse.status}</p>}
+          {apiResponse.error && <p style={{ color: "red" }}>{apiResponse.error}</p>}
+          {apiResponse.data && (
+            <div>
+              <pre>{JSON.stringify(apiResponse.data, null, 2)}</pre>
+              <button onClick={handleCopy}>Copy</button>
+              <button onClick={handleDownload}>Download</button>
             </div>
-          </div>
-        )}
-      </main>
+          )}
+        </div>
+      )}
+    </div>
 <style jsx>{`
 .endpoint {
     background: #2D1B55;
