@@ -121,7 +121,12 @@ export default function Home() {
                       type="text"
                       placeholder={`Masukkan ${param.name}`}
                       value={inputFields[param.name] || ""}
-                      onChange={(e) => setInputFields((prev) => ({ ...prev, [param.name]: e.target.value }))}
+                      onChange={(e) =>
+                        setInputFields((prev) => ({
+                          ...prev,
+                          [param.name]: e.target.value,
+                        }))
+                      }
                     />
                   </div>
                 ))
@@ -133,7 +138,10 @@ export default function Home() {
                 <button className="bubble-button" onClick={closeModal}>
                   Tutup
                 </button>
-                <button className="bubble-button" onClick={() => handleApiRequest(selectedEndpoint)}>
+                <button
+                  className="bubble-button"
+                  onClick={() => handleApiRequest(selectedEndpoint)}
+                >
                   Kirim
                 </button>
               </div>
@@ -145,7 +153,9 @@ export default function Home() {
                     className="copy-btn"
                     onClick={() =>
                       navigator.clipboard.writeText(
-                        typeof apiResponse === "object" ? JSON.stringify(apiResponse, null, 2) : apiResponse
+                        typeof apiResponse === "object"
+                          ? JSON.stringify(apiResponse, null, 2)
+                          : apiResponse
                       )
                     }
                   >
