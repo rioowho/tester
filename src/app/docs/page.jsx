@@ -65,20 +65,10 @@ export default function Home() {
             {categories.map((category, index) => (  
               <button  
                 key={index}  
-                className="category-button"  
                 onClick={() => setSelectedCategory(category.name)}  
-                style={{  
-                  background: selectedCategory === category.name ? "#5a0ca3" : "#6a0dad",  
-                  padding: "12px 20px",  
-                  borderRadius: "8px",  
-                  color: "white",  
-                  fontSize: "16px",  
-                  border: "none",  
-                  cursor: "pointer",  
-                  transition: "0.3s",  
-                }}  
+                className={`category-button ${selectedCategory === category.name ? 'selected' : ''}`}  
               >  
-                {category.name} ({category.total}) {/* Display the total endpoints for the category */}  
+                {category.name} ({category.total})  
               </button>  
             ))}  
           </div>  
@@ -104,13 +94,24 @@ export default function Home() {
       {/* CSS-in-JS for category-button */}
       <style jsx>{`
         .category-button {
+          background-color: #6a0dad;
+          padding: 12px 20px;
+          border-radius: 8px;
+          color: white;
+          font-size: 16px;
+          border: none;
+          cursor: pointer;
           font-weight: bold;
-          transition: background-color 0.3s, color 0.3s;
+          transition: background-color 0.3s, transform 0.3s;
         }
 
         .category-button:hover {
           background-color: #5a0ca3;
-          color: white;
+          transform: scale(1.05);
+        }
+
+        .category-button.selected {
+          background-color: #5a0ca3;
         }
       `}</style>
     </>
