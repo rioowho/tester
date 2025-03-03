@@ -14,16 +14,16 @@ export default function Home() {
   const [apiResponse, setApiResponse] = useState(null);
 
   useEffect(() => {
-    const { endpointsMap, total } = calculateEndpointsByTag(swaggerConfig);
+    const endpointsMap = calculateEndpointsByTag(swaggerConfig);
     setEndpointsByTag(endpointsMap);
-    setTotalEndpoints(total);
+    setTotalEndpoints(
+      Object.values(endpointsMap).reduce((sum, endpoints) => sum + endpoints.length, 0)
+    );
     setLoading(false);
   }, []);
 
   const calculateEndpointsByTag = (swaggerData) => {
     const tagEndpointMap = {};
-    let total = 0;
-
     Object.keys(swaggerData.paths).forEach((path) => {
       Object.keys(swaggerData.paths[path]).forEach((method) => {
         const operation = swaggerData.paths[path][method];
@@ -36,13 +36,11 @@ export default function Home() {
               description: operation.summary || "Deskripsi tidak tersedia",
               parameters: operation.parameters || [],
             });
-            total++;
           });
         }
       });
     });
-
-    return { endpointsMap: tagEndpointMap, total };
+    return tagEndpointMap;
   };
 
   const toggleCategory = (tag) => {
@@ -62,6 +60,7 @@ export default function Home() {
   const closeModal = () => {
     setInputFields({});
     setShowInput(false);
+    setApiResponse(null);
   };
 
   const handleInputChange = (param, value) => {
@@ -87,10 +86,22 @@ export default function Home() {
 
     try {
       const response = await fetch(finalUrl, options);
-      const data = await response.json();
+      const contentType = response.headers.get("content-type");
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      let data;
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        data = await response.text(); // Jika bukan JSON, baca sebagai teks biasa
+      }
+
       setApiResponse(data);
     } catch (error) {
-      setApiResponse({ error: "Gagal mengambil data. Periksa kembali input yang dimasukkan." });
+      setApiResponse({ error: error.message || "Gagal mengambil data. Periksa kembali input yang dimasukkan." });
     }
 
     setInputFields({});
@@ -142,50 +153,59 @@ export default function Home() {
           ))
         )}
 
-{showInput && selectedEndpoint && (
-  <div className="floating-modal">
-    <div className="modal-content">
-      <h3>Masukkan Data</h3>
-      {selectedEndpoint.parameters.length > 0 ? (
-        selectedEndpoint.parameters.map((param) => (
-          <div key={param.name} className="input-group">
-            <label>{param.name}</label>
-            <input
-              type="text"
-              placeholder={`Masukkan ${param.name}`}
-              value={inputFields[param.name] || ""}
-              onChange={(e) => handleInputChange(param.name, e.target.value)}
-            />
+        {showInput && selectedEndpoint && (
+          <div className="floating-modal">
+            <div className="modal-content">
+              <h3>Masukkan Data</h3>
+              {selectedEndpoint.parameters.length > 0 ? (
+                selectedEndpoint.parameters.map((param) => (
+                  <div key={param.name} className="input-group">
+                    <label>{param.name}</label>
+                    <input
+                      type="text"
+                      placeholder={`Masukkan ${param.name}`}
+                      value={inputFields[param.name] || ""}
+                      onChange={(e) => handleInputChange(param.name, e.target.value)}
+                    />
+                  </div>
+                ))
+              ) : (
+                <p className="no-input">Endpoint ini tidak memerlukan input.</p>
+              )}
+              <div className="floating-buttons">
+                <button className="bubble-button" onClick={closeModal}>Tutup</button>
+                <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
+              </div>
+            </div>
           </div>
-        ))
-      ) : (
-        <p className="no-input">Endpoint ini tidak memerlukan input.</p>
-      )}
-      <div className="floating-buttons">
-        <button className="bubble-button" onClick={closeModal}>Tutup</button>
-        <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
-      </div>
-    </div>
-  </div>
-)}
+        )}
 
-{handleApiRequest && selectedEndpoint && (
-  <div className="api-result">
-    <h3>Hasil API Response</h3>
-    <div className="result-content">
-      {selectedEndpoint.parameters.length > 0 ? (
-        selectedEndpoint.parameters.map((param, index) => (
-          <div key={index} className="result-item">
-            <strong>{param.name}:</strong> {apiResponse[param.name] || "Tidak ada data"}
+        {apiResponse !== null && selectedEndpoint && (
+          <div className="api-result">
+            <h3>Hasil API Response</h3>
+            <div className="result-content">
+              {typeof apiResponse === "object" && !Array.isArray(apiResponse) ? (
+                Object.keys(apiResponse).length > 0 ? (
+                  Object.entries(apiResponse).map(([key, value], index) => (
+                    <div key={index} className="result-item">
+                      <strong>{key}:</strong> {JSON.stringify(value)}
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-result">Response tidak berisi data.</p>
+                )
+              ) : (
+                <p className="error-message">
+                  {typeof apiResponse === "string" ? apiResponse : "Terjadi kesalahan dalam mengambil data."}
+                </p>
+              )}
+            </div>
           </div>
-        ))
-      ) : (
-        <p className="no-result">Endpoint ini tidak mengembalikan data dengan parameter.</p>
-      )}
-    </div>
-  </div>
-)}
+        )}
       </main>
+    </>
+  );
+}
       <style jsx>{`
 .endpoint {
     background: #2D1B55;
