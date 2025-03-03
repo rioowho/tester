@@ -1,6 +1,5 @@
 "use client";
 import Head from "next/head";
-import Script from "next/script";
 import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -26,6 +25,9 @@ export default function Home() {
 
   const categories = Object.keys(swaggerConfig.tags || {}).map((tag) => ({
     name: tag,
+    total: Object.values(swaggerConfig.paths).filter((path) =>
+      path.tags.includes(tag)
+    ).length,
   }));
 
   return (
@@ -58,7 +60,7 @@ export default function Home() {
             Total Endpoints: {totalEndpoints}  
           </h1>  
 
-          {/* Tombol kategori API */}  
+          {/* Tombol kategori API */}
           <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "center", marginBottom: "20px" }}>  
             {categories.map((category, index) => (  
               <button  
@@ -67,21 +69,21 @@ export default function Home() {
                 onClick={() => setSelectedCategory(category.name)}  
                 style={{  
                   background: selectedCategory === category.name ? "#5a0ca3" : "#6a0dad",  
-                  padding: "10px 20px",  
+                  padding: "12px 20px",  
                   borderRadius: "8px",  
-                  color: selectedCategory === category.name ? "#5a0ca3" : "#f0f0f0",  // Dark purple when selected
+                  color: "white",  
                   fontSize: "16px",  
                   border: "none",  
                   cursor: "pointer",  
                   transition: "0.3s",  
                 }}  
               >  
-                {category.name}  
+                {category.name} ({category.total}) {/* Display the total endpoints for the category */}  
               </button>  
             ))}  
           </div>  
 
-          {/* Swagger UI hanya muncul jika kategori dipilih */}  
+          {/* Swagger UI hanya muncul jika kategori dipilih */}
           {selectedCategory && (  
             <div className="card">  
               <SwaggerUI  
@@ -102,6 +104,7 @@ export default function Home() {
       {/* CSS-in-JS for category-button */}
       <style jsx>{`
         .category-button {
+          font-weight: bold;
           transition: background-color 0.3s, color 0.3s;
         }
 
