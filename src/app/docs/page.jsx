@@ -192,27 +192,28 @@ export default function Home() {
       )}
 
       {apiResponse && (
-        <div>
-          {apiResponse.debugUrl && (
-            <p>
-              <strong>Debug URL:</strong> {apiResponse.debugUrl}
-            </p>
-          )}
-          {apiResponse.status && <p>{apiResponse.status}</p>}
-          {apiResponse.error && <p style={{ color: "red" }}>{apiResponse.error}</p>}
-          {apiResponse.data && (
-            <div>
-              <pre>{JSON.stringify(apiResponse.data, null, 2)}</pre>
-              <button onClick={handleCopy}>Copy</button>
-              <button onClick={handleDownload}>Download</button>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-    </main>
+  <div>
+    {apiResponse?.debugUrl && (
+      <p>
+        <strong>Debug URL:</strong> {apiResponse.debugUrl}
+      </p>
+    )}
+    {apiResponse?.status && <p>{apiResponse.status}</p>}
+    {apiResponse?.error && <p style={{ color: "red" }}>{apiResponse.error}</p>}
+    {apiResponse?.data && (
+      <div>
+        <pre>{JSON.stringify(apiResponse.data, null, 2)}</pre>
+        <button onClick={handleCopy}>Copy</button>
+        <button onClick={handleDownload}>Download</button>
+      </div>
+    )}
+  </div>
+)}
 
 <style jsx>{`
+  /* =============================
+      STYLING UNTUK ENDPOINT 
+  ============================= */
   .endpoint {
     background: #2d1b55;
     border-radius: 0.75rem;
@@ -292,54 +293,53 @@ export default function Home() {
     color: rgba(255, 255, 255, 0.8);
   }
 
+  /* =============================
+      MODAL INPUT STYLING
+  ============================= */
   .floating-modal {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(45, 27, 85, 0.95); /* Dark purple with transparency */
+    background: rgba(45, 27, 85, 0.95);
     padding: 2rem;
     border-radius: 1rem;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     width: 90%;
     max-width: 500px;
     z-index: 1000;
-    animation: fadeIn 0.3s ease
-@keyframes fadeIn {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
     from {
-        opacity: 0;
-        transform: translate(-50%, -55%);
+      opacity: 0;
+      transform: translate(-50%, -55%);
     }
     to {
-        opacity: 1;
-        transform: translate(-50%, -50%);
+      opacity: 1;
+      transform: translate(-50%, -50%);
     }
-}
+  }
 
-.modal-content {
+  .modal-content {
     text-align: center;
     color: white;
-}
+  }
 
-.modal-content h3 {
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.input-group {
+  .input-group {
     margin-bottom: 1rem;
     text-align: left;
-}
+  }
 
-.input-group label {
+  .input-group label {
     display: block;
     font-size: 0.9rem;
     margin-bottom: 0.3rem;
     color: rgba(255, 255, 255, 0.8);
-}
+  }
 
-.input-group input {
+  .input-group input {
     width: 100%;
     padding: 0.8rem;
     border-radius: 0.5rem;
@@ -349,26 +349,20 @@ export default function Home() {
     font-size: 1rem;
     outline: none;
     transition: border 0.2s ease-in-out;
-}
+  }
 
-.input-group input:focus {
+  .input-group input:focus {
     border-color: #a67aff;
     box-shadow: 0 0 8px rgba(166, 122, 255, 0.5);
-}
+  }
 
-.no-input {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 1rem;
-}
-
-.floating-buttons {
+  .floating-buttons {
     display: flex;
     justify-content: space-between;
     margin-top: 1rem;
-}
+  }
 
-.bubble-button {
+  .bubble-button {
     background: linear-gradient(135deg, #6a11cb, #2575fc);
     border: none;
     color: white;
@@ -380,205 +374,91 @@ export default function Home() {
     position: relative;
     overflow: hidden;
     outline: none;
-}
+  }
 
-.bubble-button:hover {
+  .bubble-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 15px rgba(106, 17, 203, 0.4);
-}
+  }
 
-.bubble-button:active {
+  .bubble-button:active {
     transform: scale(0.95);
     box-shadow: 0 4px 10px rgba(106, 17, 203, 0.4);
-}
+  }
 
-.bubble-button::before {
-    content: "";
+  /* =============================
+      HASIL API RESPONSE 
+  ============================= */
+  .api-result {
+    background-color: #1e1e1e;
+    color: #dcdcdc;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 15px;
+    overflow-x: auto;
+    font-family: monospace;
+    position: relative;
+  }
+
+  .copy-btn {
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 70%);
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-}
-
-.bubble-button:hover::before {
-    opacity: 1;
-}
-
-@media (max-width: 500px) {
-    .floating-modal {
-        width: 95%;
-        padding: 1.5rem;
-    }
-
-    .bubble-button {
-        font-size: 0.9rem;
-        padding: 0.6rem 1.2rem;
-    }
-}
-.loading-text {
-    text-align: center;
-    font-size: 1.2rem;
-    color: rgba(255, 255, 255, 0.7);
-    margin: 1rem 0;
-    animation: fadeIn 0.5s ease-in-out infinite alternate;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0.5;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-.category-wrapper {
-    margin-bottom: 1rem;
-}
-
-.api-category {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 1rem;
-    border-radius: 0.75rem;
+    top: 10px;
+    left: 10px;
+    background: #007bff;
     color: white;
-    font-weight: bold;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 12px;
+    border-radius: 3px;
+  }
+
+  .download-btn {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.api-category:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateX(5px);
-}
-
-.category-count {
-    font-size: 0.9rem;
-    font-weight: normal;
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.icon {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: rgba(255, 255, 255, 0.7);
-    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
-}
-
-.api-category:hover .icon {
+    justify-content: center;
+    background: #28a745;
     color: white;
-}
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 5px;
+    margin-top: 10px;
+    width: 100%;
+  }
 
-@media (max-width: 500px) {
-    .api-category {
-        padding: 0.8rem;
-    }
-    
-    .category-count {
-        font-size: 0.8rem;
-    }
+  .copy-btn:hover {
+    background: #0056b3;
+  }
 
-    .icon {
-        font-size: 1rem;
-    }
-}
-.api-result {
-  background-color: #1e1e1e;
-  color: #dcdcdc;
-  padding: 15px;
-  border-radius: 5px;
-  margin-top: 15px;
-  overflow-x: auto;
-  font-family: monospace;
-  position: relative;
-}
+  .download-btn:hover {
+    background: #218838;
+  }
 
-.copy-btn {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
-  font-size: 12px;
-  border-radius: 3px;
-}
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
 
-.download-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #28a745;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  cursor: pointer;
-  font-size: 14px;
-  border-radius: 5px;
-  margin-top: 10px;
-  width: 100%;
-}
-
-.download-btn i {
-  margin-right: 5px;
-}
-
-.copy-btn:hover {
-  background: #0056b3;
-}
-
-.download-btn:hover {
-  background: #218838;
-}
-
-pre {
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
-
-.api-result h3 {
+  .api-result h3 {
     margin-bottom: 1rem;
     font-size: 1.3rem;
     font-weight: bold;
-    color: #a67aff; 
-}
+    color: #a67aff;
+  }
 
-.result-content {
-    white-space: pre-wrap; 
-    word-break: break-word;
-    font-size: 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 1rem;
-    border-radius: 0.5rem;
-    max-height: 300px; 
-    overflow-y: auto;
-}
-
-.result-item {
-    padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-@media (max-width: 600px) {
+  @media (max-width: 600px) {
     .api-result {
-        padding: 1rem;
+      padding: 1rem;
     }
 
     .result-content {
-        font-size: 0.9rem;
-        max-height: 250px;
+      font-size: 0.9rem;
+      max-height: 250px;
     }
-}
-      `}</style>
+  }
+`}</style>
     </>
   );
 }
