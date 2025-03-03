@@ -1,3 +1,4 @@
+
 "use client";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -190,6 +191,7 @@ export default function Home() {
     </div>
   </div>
 )}
+</main>
 <style jsx>{`
 .endpoint {
     background: #2D1B55;
