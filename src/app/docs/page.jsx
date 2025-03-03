@@ -125,7 +125,7 @@ export default function Home() {
                           className={`endpoint-btn ${endpoint.method.toLowerCase()}`}
                           onClick={() => openInputModal(endpoint)}
                         >
-                          {endpoint.method === "GET" ? "GET Data" : "POST Data"}
+                          {endpoint.method === "GET" ? "GET Data" : ">"}
                         </button>
                       </div>
                       <p className="endpoint-description">{endpoint.description}</p>
@@ -157,16 +157,10 @@ export default function Home() {
                 <p className="no-input">Endpoint ini tidak memerlukan input.</p>
               )}
               <div className="button-group">
-                <button
-                  className="submit-btn get-btn"
-                  onClick={() => handleApiRequest("GET")}
-                >
+                <button className="submit-btn purple-btn" onClick={() => handleApiRequest("GET")}>
                   Kirim GET
                 </button>
-                <button
-                  className="submit-btn post-btn"
-                  onClick={() => handleApiRequest("POST")}
-                >
+                <button className="submit-btn purple-btn" onClick={() => handleApiRequest("POST")}>
                   Kirim POST
                 </button>
                 <button className="close-btn" onClick={() => setShowInput(false)}>
@@ -193,58 +187,39 @@ export default function Home() {
         }
 
         .api-category {
-          background: #1e1e40;
-          padding: 16px;
+          background: #292952;
+          padding: 18px;
           border-radius: 12px;
           display: flex;
           justify-content: space-between;
           align-items: center;
           cursor: pointer;
-          margin-bottom: 10px;
+          margin-bottom: 15px;
+          transition: all 0.3s ease-in-out;
         }
 
-          .api-endpoint-method {
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 5px;
-  }
+        .api-category:hover {
+          background: #3a3a6e;
+          transform: scale(1.02);
+        }
 
-  .get {
-    background: #007bff; 
-    color: white;
-  }
+        .api-endpoint-method {
+          font-weight: bold;
+          padding: 6px 12px;
+          border-radius: 5px;
+        }
 
-  .post {
-    background: #28a745; 
-    color: white;
-  }
+        .get {
+          background: blue;
+        }
 
-  .endpoint-btn {
-    padding: 6px 12px;
-    margin-left: 10px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+        .post {
+          background: green;
+        }
 
-  .get-btn {
-    background: #007bff;
-    color: white;
-  }
-
-  .post-btn {
-    background: #28a745; 
-    color: white;
-  }
-
-        .response-box {
-          background: #2c2c5a;
-          padding: 15px;
-          border-radius: 8px;
-          margin-top: 40px;
-          overflow-x: auto;
-          white-space: pre-wrap;
-          word-wrap: break-word;
+        .purple-btn {
+          background: #6a0dad;
+          color: white;
         }
       `}</style>
     </>
