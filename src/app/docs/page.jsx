@@ -73,11 +73,14 @@ export default function Home() {
 const handleApiRequest = async () => {
   if (!selectedEndpoint) return;
 
+  // Menentukan URL final, baik absolut maupun relatif
   let finalUrl = selectedEndpoint.path.startsWith("http")
-    ? selectedEndpoint.path 
-    : `${selectedEndpoint.serverUrl}${selectedEndpoint.path}`; 
+    ? selectedEndpoint.path // Gunakan langsung jika absolut
+    : `${selectedEndpoint.serverUrl.replace(/\/$/, "")}/${selectedEndpoint.path.replace(/^\//, "")}`; // Gabungkan serverUrl & path tanpa double slash
+
+  // Ganti parameter dalam URL jika ada
   Object.keys(inputFields).forEach((param) => {
-    finalUrl = finalUrl.replace(`{${param}}`, encodeURIComponent(inputFields[param]));
+    finalUrl = finalUrl.replace(`{${param}}`, encodeURIComponent(inputFields[param] || ""));
   });
 
   const options = {
@@ -94,7 +97,7 @@ const handleApiRequest = async () => {
     const contentType = response.headers.get("content-type");
 
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
     }
 
     let data;
@@ -106,7 +109,8 @@ const handleApiRequest = async () => {
 
     setApiResponse(data);
   } catch (error) {
-    setApiResponse({ error: error.message || "Gagal mengambil data." });
+    console.error("API Request Error:", error); 
+    setApiResponse({ error: error.message || "Gagal mengambil data dari API." });
   }
   setInputFields({});
 };
