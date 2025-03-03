@@ -1,4 +1,4 @@
-"use client";
+""use client";
 import swaggerConfig from "../swagger-config.json";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
@@ -29,7 +29,7 @@ export default function Home() {
               path,
               description: operation?.description || "Deskripsi tidak tersedia",
               parameters: operation?.parameters || [],
-              serverUrl: swaggerData.servers?.[0]?.url || "", 
+              serverUrl: swaggerData.servers?.[0]?.url || "",
             });
           });
         });
@@ -72,8 +72,8 @@ export default function Home() {
 
   const handleApiRequest = async () => {
     if (!selectedEndpoint) return;
-    let baseUrl = selectedEndpoint.serverUrl.replace(/\/$/, ""); // Hapus slash di akhir server URL
-    let endpointPath = selectedEndpoint.path.replace(/^\//, ""); // Hapus slash di awal path
+    let baseUrl = selectedEndpoint.serverUrl.replace(/\/$/, "");
+    let endpointPath = selectedEndpoint.path.replace(/^\//, "");
     let finalUrl = selectedEndpoint.path.startsWith("http")
       ? selectedEndpoint.path
       : `${baseUrl}/${endpointPath}`;
@@ -109,7 +109,7 @@ export default function Home() {
         }
       });
 
-      setApiResponse(response.data); // Tampilkan response dari API
+      setApiResponse(response.data);
     } catch (error) {
       console.error("API Request Error:", error);
       setApiResponse({ error: error.message || "Gagal mengambil data dari API." });
@@ -166,54 +166,56 @@ export default function Home() {
         )}
       </div>
 
-    {showInput && selectedEndpoint && (
-      <div>
-        <h3>Input Parameters for {selectedEndpoint.method} {selectedEndpoint.path}</h3>
-        <form>
-          {selectedEndpoint.parameters.map((param) => (
-            <div key={param.name}>
-              <label>{param.name}</label>
-              <input
-                type="text"
-                value={inputFields[param.name] || ""}
-                onChange={(e) =>
-                  setInputFields({
-                    ...inputFields,
-                    [param.name]: e.target.value
-                  })
-                }
-              />
-            </div>
-          ))}
-        </form>
-        <button onClick={handleApiRequest}>Kirim</button>
-        <button onClick={closeModal}>Tutup</button>
-      </div>
-    )}
+      {showInput && selectedEndpoint && (
+        <div>
+          <h3>Input Parameters for {selectedEndpoint.method} {selectedEndpoint.path}</h3>
+          <form>
+            {selectedEndpoint.parameters.map((param) => (
+              <div key={param.name}>
+                <label>{param.name}</label>
+                <input
+                  type="text"
+                  value={inputFields[param.name] || ""}
+                  onChange={(e) =>
+                    setInputFields({
+                      ...inputFields,
+                      [param.name]: e.target.value
+                    })
+                  }
+                />
+              </div>
+            ))}
+          </form>
+          <button onClick={handleApiRequest}>Kirim</button>
+          <button onClick={closeModal}>Tutup</button>
+        </div>
+      )}
 
-    {apiResponse && (
-      <div>
-        {apiResponse.debugUrl && (
-          <p>
-            <strong>Debug URL:</strong> {apiResponse.debugUrl}
-          </p>
-        )}
-        {apiResponse.status && <p>{apiResponse.status}</p>}
-        {apiResponse.error && <p style={{ color: "red" }}>{apiResponse.error}</p>}
-        {apiResponse.data && (
-          <div>
-            <pre>{JSON.stringify(apiResponse.data, null, 2)}</pre>
-            <button onClick={handleCopy}>Copy</button>
-            <button onClick={handleDownload}>Download</button>
-          </div>
-        )}
-      </div>
-    )}
-  </div>
-);
+      {apiResponse && (
+        <div>
+          {apiResponse.debugUrl && (
+            <p>
+              <strong>Debug URL:</strong> {apiResponse.debugUrl}
+            </p>
+          )}
+          {apiResponse.status && <p>{apiResponse.status}</p>}
+          {apiResponse.error && <p style={{ color: "red" }}>{apiResponse.error}</p>}
+          {apiResponse.data && (
+            <div>
+              <pre>{JSON.stringify(apiResponse.data, null, 2)}</pre>
+              <button onClick={handleCopy}>Copy</button>
+              <button onClick={handleDownload}>Download</button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 <style jsx>{`
-.endpoint {
-    background: #2D1B55;
+  .endpoint {
+    background: #2d1b55;
     border-radius: 0.75rem;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
@@ -221,10 +223,10 @@ export default function Home() {
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     color: white;
-}
+  }
 
-.api-endpoint {
-    background: rgba(255, 255, 255, 0.1); 
+  .api-endpoint {
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 0.75rem;
     padding: 1rem;
     margin-bottom: 1rem;
@@ -232,80 +234,78 @@ export default function Home() {
     border: 1px solid rgba(255, 255, 255, 0.2);
     transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     color: white;
-}
+  }
 
-.api-endpoint:hover {
+  .api-endpoint:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
+  }
 
-.endpoint-header {
+  .endpoint-header {
     display: flex;
     align-items: center;
     gap: 1rem;
     justify-content: space-between;
-}
+  }
 
-.api-method {
+  .api-method {
     font-size: 0.9rem;
     font-weight: bold;
     padding: 0.3rem 0.6rem;
     border-radius: 0.5rem;
     text-transform: uppercase;
-}
+  }
 
-.api-method.get {
-    background: #007bff; l
+  .api-method.get {
+    background: #007bff;
     color: white;
-}
+  }
 
-.api-method.post {
+  .api-method.post {
     background: #28a745;
     color: white;
-}
+  }
 
-.endpoint-path {
+  .endpoint-path {
     flex-grow: 1;
     font-size: 1rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
+  }
 
-.endpoint-btn {
+  .endpoint-btn {
     background: none;
     border: none;
     color: rgba(255, 255, 255, 0.7);
     font-size: 1.2rem;
     cursor: pointer;
     transition: color 0.2s ease-in-out;
-}
+  }
 
-.endpoint-btn:hover {
+  .endpoint-btn:hover {
     color: white;
-}
+  }
 
-.endpoint-description {
+  .endpoint-description {
     margin-top: 0.5rem;
     font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.8);
-}
+  }
 
-.floating-modal {
+  .floating-modal {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(45, 27, 85, 0.95); /* Ungu gelap dengan transparansi */
+    background: rgba(45, 27, 85, 0.95); /* Dark purple with transparency */
     padding: 2rem;
     border-radius: 1rem;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     width: 90%;
     max-width: 500px;
     z-index: 1000;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
+    animation: fadeIn 0.3s ease
 @keyframes fadeIn {
     from {
         opacity: 0;
