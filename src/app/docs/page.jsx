@@ -3,8 +3,8 @@ import Head from "next/head";
 import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
 import { useEffect, useState } from "react";
-import { FaChevronDown, FaChevronRight } from "react-icons/fa"; 
-import swaggerConfig from "../swagger-config.json"; 
+import { FaChevronDown, FaChevronRight } from "react-icons/fa";
+import swaggerConfig from "../swagger-config.json";
 
 export default function Home() {
   const [endpointsByTag, setEndpointsByTag] = useState({});
@@ -64,152 +64,179 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const style = document.createElement("style");
-    style.innerHTML = `
-      body {
-        background-color: #181818;
-        color: #e0e0e0;
-        font-family: 'Roboto', sans-serif;
-      }
+  const style = document.createElement("style");
+  style.innerHTML = `
+    body {
+      background: linear-gradient(180deg, #0f0f10, #1a1a1e);
+      color: #e0e0e0;
+      font-family: 'Inter', sans-serif;
+    }
 
-      .swagger-ui {
-        background-color: #1e1e1e;
-        padding: 20px;
-        border-radius: 8px;
-      }
+    .swagger-ui {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
 
-      .swagger-ui .info .title,
-      .swagger-ui .opblock-summary-method,
-      .swagger-ui .opblock-summary-path,
-      .swagger-ui .model-title {
-        color: #ffffff !important;
-      }
+    .swagger-ui .topbar {
+      background: #111;
+      border-bottom: 1px solid #222;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-      .swagger-ui .topbar {
-        background-color: #242424;
-        padding: 10px 20px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      }
+    .swagger-ui .info {
+      background: #1a1a1e;
+      padding: 16px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-      .api-category {
-        background-color: #242424;
-        border: 1px solid #444;
-        padding: 16px;
-        margin-bottom: 16px;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
+    .swagger-ui .info .title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ffffff;
+    }
 
-      .api-category:hover {
-        background-color: #2a2a2a;
-        border-color: #555;
-      }
+    .api-category {
+      background: #1e1e24;
+      border: 1px solid #333;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
 
-      .api-category-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 18px;
-        font-weight: bold;
-        color: #f0f0f0;
-      }
+    .api-category:hover {
+      background: #25252b;
+    }
 
-      .api-category-content {
-        padding-top: 12px;
-        animation: fadeIn 0.3s ease-in-out;
-      }
+    .api-category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #ffffff;
+      cursor: pointer;
+    }
 
-      .icon {
-        font-size: 20px;
-        color: #cccccc;
-        transition: transform 0.3s ease;
-      }
+    .api-category-content {
+      padding-top: 12px;
+    }
 
-      .api-category.expanded .icon {
-        transform: rotate(180deg);
-      }
+    .api-endpoint {
+      background: #24242b;
+      border: 1px solid #3a3a42;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    }
 
-      .api-endpoint {
-        background-color: #2a2a2a;
-        border: 1px solid #444;
-        padding: 12px 16px;
-        border-radius: 8px;
-        margin-bottom: 10px;
-        transition: all 0.3s ease-in-out;
-      }
+    .api-endpoint:hover {
+      border-color: #555;
+    }
 
-      .api-endpoint:hover {
-        background-color: #333;
-        border-color: #666;
-      }
+    .api-endpoint-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+    }
 
-      .api-endpoint-method {
-        font-weight: bold;
-        color: #ffa500;
-      }
+    .api-endpoint-method {
+      font-weight: bold;
+      background: #008080;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 5px;
+      text-transform: uppercase;
+    }
 
-      .api-endpoint-path {
-        font-weight: 600;
-        color: #ffffff;
-      }
+    .api-endpoint-path {
+      font-weight: 600;
+      color: #ffffff;
+    }
 
-      .swagger-ui input,
-      .swagger-ui select,
-      .swagger-ui textarea {
-        background-color: #2a2a2a;
-        color: #ffffff;
-        border: 1px solid #444;
-        border-radius: 6px;
-      }
+    .swagger-ui input[type="text"],
+    .swagger-ui input[type="password"],
+    .swagger-ui select,
+    .swagger-ui textarea {
+      background: #2a2a30;
+      color: #ffffff;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 10px;
+    }
 
-      .swagger-ui button {
-        background-color: #ff7f50;
-        color: white;
-        border-radius: 6px;
-        transition: background 0.3s ease;
-      }
+    .swagger-ui button {
+      background: #6d4aff;
+      color: white;
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-weight: bold;
+    }
 
-      .swagger-ui button:hover {
-        background-color: #ff9c68;
-      }
+    .swagger-ui button:hover {
+      background: #7a5aff;
+    }
 
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-5px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-    `;
-    document.head.appendChild(style);
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
+    .swagger-ui .opblock {
+      background: #1f1f24;
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid #292930;
+    }
+
+    .swagger-ui .opblock-summary {
+      background: #252530;
+      border-radius: 6px;
+      padding: 12px;
+      font-weight: bold;
+    }
+
+    .swagger-ui .response {
+      background: #18181e;
+      padding: 10px;
+      border-radius: 8px;
+    }
+  `;
+  document.head.appendChild(style);
+  return () => {
+    document.head.removeChild(style);
+  };
+}, []);
 
   return (
     <>
       <Head>
         <title>VelynAPI</title>
-        <meta name="description" content="VelynAPI - Dokumentasi API yang keren dengan tampilan dark mode." />
+        <meta name="title" content="VelynAPI - Dokumentasi" />
       </Head>
       <main className="p-6">
         <div className="bg-black shadow-md rounded-lg p-4">
           {loading ? (
-            <p className="text-center text-white">Memuat endpoint...</p>
+            <p>Memuat endpoint...</p>
           ) : (
             Object.keys(endpointsByTag).map((tag) => (
-              <div key={tag} className={`api-category ${expandedTag === tag ? "expanded" : ""}`}>
+              <div
+                key={tag}
+                className={`api-category ${expandedTag === tag ? "expanded" : ""}`}
+              >
                 <div className="api-category-header" onClick={() => toggleCategory(tag)}>
                   <span>{`# ${tag.toUpperCase()}`}</span>
-                  <span>{`${endpointsByTag[tag].length} endpoint`}</span>
                   <span className="icon">
                     {expandedTag === tag ? <FaChevronDown /> : <FaChevronRight />}
                   </span>
                 </div>
-                {expandedTag === tag && (
-                  <div className="api-category-content">
+                <div className="api-category-content">
+                  {expandedTag === tag && (
                     <SwaggerUI key={tag} spec={getFilteredSpec(tag)} />
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             ))
           )}
