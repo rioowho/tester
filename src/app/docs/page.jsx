@@ -34,6 +34,15 @@ export default function Home() {
     };
   });
 
+  // Filter paths based on selected category
+  const filteredPaths = selectedCategory
+    ? Object.fromEntries(
+        Object.entries(swaggerConfig.paths).filter(([_, path]) =>
+          path.tags.includes(selectedCategory)
+        )
+      )
+    : swaggerConfig.paths;
+
   return (
     <>
       <Head>
@@ -83,11 +92,7 @@ export default function Home() {
               <SwaggerUI
                 spec={{
                   ...swaggerConfig,
-                  paths: Object.fromEntries(
-                    Object.entries(swaggerConfig.paths).filter(([_, value]) =>
-                      value.tags.includes(selectedCategory)
-                    )
-                  ),
+                  paths: filteredPaths,
                 }}
               />
             </div>
