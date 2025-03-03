@@ -27,9 +27,9 @@ export default function Home() {
             tagEndpointMap[tag].push({
               method: method.toUpperCase(),
               path,
-              description: operation?.summary || "Deskripsi tidak tersedia",
+              description: operation?.description || "Deskripsi tidak tersedia",
               parameters: operation?.parameters || [],
-              serverUrl: swaggerData.servers?.[0]?.url || "", // Mengambil base URL dari swaggerConfig
+              serverUrl: swaggerData.servers?.[0]?.url || "", // Ambil base URL jika ada
             });
           });
         });
@@ -83,30 +83,21 @@ export default function Home() {
 
     const headers = { "Content-Type": "application/json" };
 
-    // Menangani parameter query untuk GET request
     if (method === "GET") {
+      // Ambil parameter query yang tidak kosong
       const queryParams = new URLSearchParams(
         Object.fromEntries(
           Object.entries(inputFields).filter(([_, value]) => value.trim() !== "")
         )
       ).toString();
+
       if (queryParams) url += `?${queryParams}`;
     }
-
-    const body =
-      method === "GET"
-        ? undefined
-        : JSON.stringify(
-            Object.fromEntries(
-              Object.entries(inputFields).filter(([_, value]) => value.trim() !== "")
-            )
-          );
 
     try {
       const response = await fetch(url, {
         method,
         headers,
-        body,
       });
 
       const result = await response.json();
@@ -119,7 +110,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>VelynApi</title>
+        <title>API Explorer</title>
       </Head>
 
       <main>
