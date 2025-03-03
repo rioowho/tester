@@ -142,35 +142,52 @@ export default function Home() {
           ))
         )}
 
-        {showInput && selectedEndpoint && (
-          <div className="floating-modal">
-            <div className="modal-content">
-              <h3>Masukkan Data</h3>
-              {selectedEndpoint.parameters.length > 0 ? (
-                selectedEndpoint.parameters.map((param) => (
-                  <div key={param.name} className="input-group">
-                    <label>{param.name}</label>
-                    <input
-                      type="text"
-                      placeholder={`Masukkan ${param.name}`}
-                      value={inputFields[param.name] || ""}
-                      onChange={(e) => handleInputChange(param.name, e.target.value)}
-                    />
-                  </div>
-                ))
-              ) : (
-                <p className="no-input">Endpoint ini tidak memerlukan input.</p>
-              )}
-              <div className="floating-buttons">
-                <button className="bubble-button" onClick={closeModal}>Tutup</button>
-                <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
-              </div>
-            </div>
+{showInput && selectedEndpoint && (
+  <div className="floating-modal">
+    <div className="modal-content">
+      <h3>Masukkan Data</h3>
+      {selectedEndpoint.parameters.length > 0 ? (
+        selectedEndpoint.parameters.map((param) => (
+          <div key={param.name} className="input-group">
+            <label>{param.name}</label>
+            <input
+              type="text"
+              placeholder={`Masukkan ${param.name}`}
+              value={inputFields[param.name] || ""}
+              onChange={(e) => handleInputChange(param.name, e.target.value)}
+            />
           </div>
-        )}
+        ))
+      ) : (
+        <p className="no-input">Endpoint ini tidak memerlukan input.</p>
+      )}
+      <div className="floating-buttons">
+        <button className="bubble-button" onClick={closeModal}>Tutup</button>
+        <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
+      </div>
+    </div>
+  </div>
+)}
+
+{/* Hasil API Response */}
+{apiResponse && selectedEndpoint && (
+  <div className="api-result">
+    <h3>Hasil API Response</h3>
+    <div className="result-content">
+      {selectedEndpoint.parameters.length > 0 ? (
+        selectedEndpoint.parameters.map((param, index) => (
+          <div key={index} className="result-item">
+            <strong>{param.name}:</strong> {apiResponse[param.name] || "Tidak ada data"}
+          </div>
+        ))
+      ) : (
+        <p className="no-result">Endpoint ini tidak mengembalikan data dengan parameter.</p>
+      )}
+    </div>
+  </div>
+)}
       </main>
       <style jsx>{`
-/* Container utama untuk semua endpoint */
 .endpoint {
     background: #2D1B55; /* Ungu gelap */
     border-radius: 0.75rem;
@@ -182,9 +199,8 @@ export default function Home() {
     color: white;
 }
 
-/* Setiap API Endpoint */
 .api-endpoint {
-    background: rgba(255, 255, 255, 0.1); /* Transparan sedikit */
+    background: rgba(255, 255, 255, 0.1); 
     border-radius: 0.75rem;
     padding: 1rem;
     margin-bottom: 1rem;
@@ -251,60 +267,251 @@ export default function Home() {
     color: rgba(255, 255, 255, 0.8);
 }
 
-        .bubble-button {
-          background: #5a189a;
-          color: white;
-          padding: 12px 20px;
-          border-radius: 50px;
-          border: none;
-          cursor: pointer;
-          transition: transform 0.3s ease-in-out;
-        }
+.floating-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(45, 27, 85, 0.95); /* Ungu gelap dengan transparansi */
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 500px;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-in-out;
+}
 
-        .bubble-button:hover {
-          transform: scale(1.05);
-        }
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -55%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
 
-        .floating-modal {
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-        }
-
-    .modal-content {
-    background: #3a0ca3;
-    padding: 25px; 
-    border-radius: 12px;
-    animation: bubble 0.5s ease-out;
-  }
-
-  .input-group {
-    margin-bottom: 15px; 
-  }
-
-  .input-group input {
-    background: #2b0c5e; 
-    border: 1px solid #5a189a;
-    padding: 10px;
-    border-radius: 6px;
+.modal-content {
+    text-align: center;
     color: white;
-    width: 100%;
-  }
+}
 
-        @keyframes bubble {
-          from {
-            transform: scale(0.8);
-          }
-          to {
-            transform: scale(1);
-          }
-        }
+.modal-content h3 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.input-group {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s ease-in-out;
+}
+
+.input-group input:focus {
+    border-color: #a67aff;
+    box-shadow: 0 0 8px rgba(166, 122, 255, 0.5);
+}
+
+.no-input {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+}
+
+.floating-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.bubble-button {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    border: none;
+    color: white;
+    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    outline: none;
+}
+
+.bubble-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(106, 17, 203, 0.4);
+}
+
+.bubble-button:active {
+    transform: scale(0.95);
+    box-shadow: 0 4px 10px rgba(106, 17, 203, 0.4);
+}
+
+.bubble-button::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.bubble-button:hover::before {
+    opacity: 1;
+}
+
+@media (max-width: 500px) {
+    .floating-modal {
+        width: 95%;
+        padding: 1.5rem;
+    }
+
+    .bubble-button {
+        font-size: 0.9rem;
+        padding: 0.6rem 1.2rem;
+    }
+}
+.loading-text {
+    text-align: center;
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 1rem 0;
+    animation: fadeIn 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0.5;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.category-wrapper {
+    margin-bottom: 1rem;
+}
+
+.api-category {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 0.75rem;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out, transform 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.api-category:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+}
+
+.category-count {
+    font-size: 0.9rem;
+    font-weight: normal;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.icon {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.7);
+    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.api-category:hover .icon {
+    color: white;
+}
+
+@media (max-width: 500px) {
+    .api-category {
+        padding: 0.8rem;
+    }
+    
+    .category-count {
+        font-size: 0.8rem;
+    }
+
+    .icon {
+        font-size: 1rem;
+    }
+}
+/* Container hasil API */
+.api-result {
+    background: rgba(45, 27, 85, 0.95); /* Ungu gelap transparan */
+    color: white;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    margin-top: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-x: auto;
+}
+
+.api-result h3 {
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #a67aff; /* Warna ungu terang */
+}
+
+.result-content {
+    white-space: pre-wrap; 
+    word-break: break-word;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    max-height: 300px; 
+    overflow-y: auto;
+}
+
+.result-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 600px) {
+    .api-result {
+        padding: 1rem;
+    }
+
+    .result-content {
+        font-size: 0.9rem;
+        max-height: 250px;
+    }
+}
       `}</style>
     </>
   );
