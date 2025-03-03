@@ -1,7 +1,7 @@
 "use client";
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import { FaChevronRight, FaChevronDown, FaExternalLinkAlt } from "react-icons/fa";
+import { FaChevronRight, FaChevronDown } from "react-icons/fa";
 import swaggerConfig from "../swagger-config.json";
 
 export default function Home() {
@@ -81,7 +81,6 @@ export default function Home() {
       setApiResponse({ error: "Gagal mengambil data. Periksa kembali input yang dimasukkan." });
     }
 
-    // Setelah submit, tutup modal input
     setShowInput(false);
   };
 
@@ -121,7 +120,7 @@ export default function Home() {
                           onClick={() => openInputModal(endpoint)}
                           title="Masukkan data untuk endpoint ini"
                         >
-                          <FaExternalLinkAlt />
+                          <FaChevronRight />
                         </span>
                       </div>
                       <p className="endpoint-description">{endpoint.description}</p>
@@ -136,11 +135,11 @@ export default function Home() {
         {showInput && selectedEndpoint && (
           <div className="modal">
             <div className="modal-content">
-              <h3>Masukkan Data untuk Endpoint</h3>
+              <h3>Masukkan Data</h3>
               {selectedEndpoint.parameters.length > 0 ? (
                 selectedEndpoint.parameters.map((param) => (
-                  <div key={param.name}>
-                    <label>{param.name}:</label>
+                  <div key={param.name} className="input-group">
+                    <label>{param.name}</label>
                     <input
                       type="text"
                       placeholder={`Masukkan ${param.name}`}
@@ -150,64 +149,90 @@ export default function Home() {
                   </div>
                 ))
               ) : (
-                <p>Endpoint ini tidak memerlukan input.</p>
+                <p className="no-input">Endpoint ini tidak memerlukan input.</p>
               )}
-              <button className="submit-btn" onClick={handleInputSubmit}>
-                Kirim
-              </button>
-              <button className="close-btn" onClick={() => setShowInput(false)}>
-                Tutup
-              </button>
+              <div className="button-group">
+                <button className="submit-btn" onClick={handleInputSubmit}>
+                  Kirim
+                </button>
+                <button className="close-btn" onClick={() => setShowInput(false)}>
+                  Tutup
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-
-        {apiResponse && (
-          <div className="api-response">
-            <h3>Hasil API:</h3>
-            <pre>
-              {showFullResponse
-                ? JSON.stringify(apiResponse, null, 2)
-                : JSON.stringify(apiResponse, null, 2).slice(0, 200)}
-            </pre>
-            {JSON.stringify(apiResponse).length > 200 && (
-              <button onClick={() => setShowFullResponse(!showFullResponse)}>
-                {showFullResponse ? "Sembunyikan" : "Tampilkan Semua"}
-              </button>
-            )}
           </div>
         )}
       </main>
 
       <style jsx>{`
-        .container {
-          max-width: 600px;
-          margin: auto;
-          padding: 20px;
+        .modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
-        .api-category {
-          background: #1e1e40;
-          border-radius: 12px;
-          padding: 16px;
+        .modal-content {
+          background: #fff;
+          padding: 20px;
+          border-radius: 8px;
+          width: 300px;
+          text-align: center;
+        }
+
+        .input-group {
+          margin-bottom: 15px;
+          text-align: left;
+        }
+
+        .input-group label {
+          display: block;
+          margin-bottom: 5px;
+          font-weight: bold;
+        }
+
+        .input-group input {
+          width: 100%;
+          padding: 8px;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+        }
+
+        .button-group {
           display: flex;
           justify-content: space-between;
-          align-items: center;
+          margin-top: 10px;
+        }
+
+        .submit-btn {
+          background: #007bff;
+          color: white;
+          padding: 8px 12px;
+          border: none;
+          border-radius: 5px;
           cursor: pointer;
         }
 
-        .endpoints-container {
-          padding: 10px;
-          background: #22224a;
-          border-radius: 8px;
-          margin-top: 5px;
+        .close-btn {
+          background: #dc3545;
+          color: white;
+          padding: 8px 12px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
         }
 
-        .api-endpoint {
-          background: #2c2c5a;
-          border-radius: 10px;
-          padding: 12px;
-          margin-top: 10px;
+        .submit-btn:hover {
+          background: #0056b3;
+        }
+
+        .close-btn:hover {
+          background: #c82333;
         }
       `}</style>
     </>
