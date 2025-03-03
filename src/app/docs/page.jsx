@@ -1,4 +1,4 @@
-"use client";
+""use client";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import swaggerConfig from "../swagger-config.json";
@@ -88,6 +88,7 @@ export default function Home() {
       setApiResponse({ error: "Gagal mengambil data. Periksa kembali input yang dimasukkan." });
     }
 
+    // Reset input & tutup modal setelah request
     setInputFields({});
     setShowInput(false);
   };
@@ -106,11 +107,11 @@ export default function Home() {
         ) : (
           Object.keys(endpointsByTag).map((tag) => (
             <div key={tag} className="category-wrapper">
-              <div className="api-category" onClick={() => toggleCategory(tag)}>
+              <button className="category-button" onClick={() => toggleCategory(tag)}>
                 <span>{tag.toUpperCase()}</span>
                 <span className="category-count">{endpointsByTag[tag].length} endpoints</span>
                 <span className="icon">{expandedTag === tag ? "▼" : ">"}</span>
-              </div>
+              </button>
 
               {expandedTag === tag && (
                 <div className="endpoints-container">
@@ -156,53 +157,64 @@ export default function Home() {
               ) : (
                 <p className="no-input">Endpoint ini tidak memerlukan input.</p>
               )}
-              <div className="modal-buttons">
-                <button className="floating-btn" onClick={() => setShowInput(false)}>Tutup</button>
-                <button className="floating-btn" onClick={handleApiRequest}>Kirim</button>
+              <div className="floating-buttons">
+                <button className="bubble-button" onClick={() => setShowInput(false)}>Tutup</button>
+                <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
               </div>
             </div>
           </div>
         )}
 
-        {apiResponse && (
-          <div className="response-box">
-            <h3>Hasil Response</h3>
-            <pre className="response-text">{JSON.stringify(apiResponse, null, 2)}</pre>
-          </div>
-        )}
       </main>
 
       <style jsx>{`
-        .container {
-          max-width: 700px;
-          margin: auto;
-          padding: 20px;
+        .category-button {
+          background: linear-gradient(135deg, #3a3a6e, #5050a1);
+          padding: 16px;
+          border-radius: 12px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          cursor: pointer;
+          width: 100%;
+          border: none;
+          color: white;
+          font-size: 16px;
+          margin-bottom: 15px;
+          transition: transform 0.3s ease-in-out;
         }
 
-        .api-endpoint-method {
-          font-weight: bold;
-          margin-right: 10px;
-          padding: 5px 10px;
-          border-radius: 5px;
+        .category-button:hover {
+          transform: scale(1.05);
         }
 
-        .get { background-color: blue; color: white; }
-        .post { background-color: green; color: white; }
+        .api-endpoint {
+          background: #1e1e3f;
+          padding: 15px;
+          border-radius: 8px;
+          margin-top: 15px;
+        }
 
-        .floating-btn {
+        .floating-buttons {
+          display: flex;
+          gap: 10px;
           position: fixed;
           bottom: 20px;
           right: 20px;
-          background: #ff5722;
+        }
+
+        .bubble-button {
+          background: #5a189a;
           color: white;
-          padding: 10px 15px;
+          padding: 12px 20px;
           border-radius: 50px;
           border: none;
           cursor: pointer;
+          transition: transform 0.6s ease-out;
         }
 
-        .floating-btn:hover {
-          background: #e64a19;
+        .bubble-button:hover {
+          transform: scale(1.1);
         }
       `}</style>
     </>
