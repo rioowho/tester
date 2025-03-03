@@ -108,26 +108,48 @@ export default function Home() {
 {selectedCategory && (
   <div 
     style={{
-      marginTop: "20px",
+      position: "fixed",
+      bottom: "50px",
+      right: "50px",
       width: "90%",
-      maxWidth: "1200px",
-      background: "#1a1a2e",
-      borderRadius: "10px",
+      maxWidth: "1000px",
+      background: "#220f40", // Warna ungu gelap
+      borderRadius: "15px",
       padding: "20px",
-      boxShadow: "0 4px 8px rgba(255, 255, 255, 0.1)",
-      overflow: "hidden"
+      boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
+      overflowX: "auto",
+      zIndex: 1000,
+      transition: "transform 0.3s ease-in-out",
     }}
   >
+    {/* Tombol silang untuk menutup */}
+    <span 
+      onClick={() => setSelectedCategory(null)} 
+      style={{
+        position: "absolute",
+        top: "10px",
+        left: "10px",
+        fontSize: "20px",
+        fontWeight: "bold",
+        cursor: "pointer",
+        color: "white",
+      }}
+    >
+      ✖
+    </span>
+
     <SwaggerUI
       spec={{
         ...swaggerConfig,
-        info: {}, // Menghapus bagian atas Swagger UI (judul & versi)
+        info: {}, // Menghapus bagian atas Swagger UI
         paths: Object.fromEntries(
           Object.entries(swaggerConfig.paths).filter(([_, value]) =>
             Object.values(value).some((method) => method.tags?.includes(selectedCategory))
           )
         ),
       }}
+      docExpansion="none"
+      defaultModelsExpandDepth={-1}
     />
   </div>
 )}
