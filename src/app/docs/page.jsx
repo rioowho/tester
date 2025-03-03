@@ -22,7 +22,6 @@ export default function Home() {
     setTotalEndpoints(count);
   }, []);
 
-  // Create categories dynamically from swaggerConfig tags and calculate total endpoints per category
   const categories = Object.keys(swaggerConfig.tags || {}).map((tag) => {
     const categoryEndpoints = Object.values(swaggerConfig.paths).filter((path) =>
       path.tags.includes(tag)
@@ -34,7 +33,6 @@ export default function Home() {
     };
   });
 
-  // Filter paths based on selected category
   const filteredPaths = selectedCategory
     ? Object.fromEntries(
         Object.entries(swaggerConfig.paths).filter(([_, path]) =>
@@ -74,7 +72,7 @@ export default function Home() {
           </h1>
 
           {/* Category Buttons */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "center", marginBottom: "20px" }}>
+          <div className="category-buttons-container">
             {categories.map((category, index) => (
               <button
                 key={index}
@@ -88,7 +86,7 @@ export default function Home() {
 
           {/* Display Swagger UI for the selected category */}
           {selectedCategory && (
-            <div className="card">
+            <div className="swagger-ui-container">
               <SwaggerUI
                 spec={{
                   ...swaggerConfig,
@@ -100,32 +98,76 @@ export default function Home() {
         </div>
       </main>
 
-      {/* CSS Styling for Category Buttons */}
+      {/* Additional CSS Enhancements */}
       <style jsx>{`
+        .category-buttons-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 15px;
+          justify-content: center;
+          margin-bottom: 20px;
+        }
+
         .category-button {
           background-color: #6a0dad;
-          padding: 12px 20px;
-          border-radius: 8px;
+          padding: 14px 24px;
+          border-radius: 10px;
           color: white;
           font-size: 16px;
+          font-weight: bold;
           border: none;
           cursor: pointer;
-          font-weight: bold;
-          transition: background-color 0.3s, transform 0.3s;
+          transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+          min-width: 150px;
+          text-align: center;
         }
 
         .category-button:hover {
           background-color: #5a0ca3;
           transform: scale(1.05);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         .category-button.selected {
           background-color: #5a0ca3;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .card {
+        .swagger-ui-container {
           width: 100%;
           margin-top: 20px;
+          padding: 20px;
+          border-radius: 10px;
+          background-color: #1f1f2f;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Container Styling */
+        .container {
+          max-width: 1200px;
+          width: 100%;
+          padding: 25px;
+          margin: 0 auto;
+          background-color: #111;
+          border-radius: 12px;
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+          color: #fff;
+        }
+
+        /* Making the layout responsive */
+        @media (max-width: 768px) {
+          .category-button {
+            padding: 10px 18px;
+            font-size: 14px;
+            min-width: 120px;
+          }
+
+          h1 {
+            font-size: 20px;
+          }
         }
       `}</style>
     </>
