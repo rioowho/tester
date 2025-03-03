@@ -59,6 +59,11 @@ export default function Home() {
     setShowInput(true);
   };
 
+  const closeModal = () => {
+    setInputFields({});
+    setShowInput(false);
+  };
+
   const handleInputChange = (param, value) => {
     setInputFields((prev) => ({ ...prev, [param]: value }));
   };
@@ -88,7 +93,6 @@ export default function Home() {
       setApiResponse({ error: "Gagal mengambil data. Periksa kembali input yang dimasukkan." });
     }
 
-    // Reset input & tutup modal setelah request
     setInputFields({});
     setShowInput(false);
   };
@@ -107,21 +111,21 @@ export default function Home() {
         ) : (
           Object.keys(endpointsByTag).map((tag) => (
             <div key={tag} className="category-wrapper">
-              <button className="category-button" onClick={() => toggleCategory(tag)}>
+              <div className="api-category" onClick={() => toggleCategory(tag)}>
                 <span>{tag.toUpperCase()}</span>
                 <span className="category-count">{endpointsByTag[tag].length} endpoints</span>
                 <span className="icon">{expandedTag === tag ? "▼" : ">"}</span>
-              </button>
+              </div>
 
               {expandedTag === tag && (
                 <div className="endpoints-container">
                   {endpointsByTag[tag].map((endpoint, index) => (
                     <div key={index} className="api-endpoint">
                       <div className="api-endpoint-header">
-                        <span className={`api-endpoint-method ${endpoint.method.toLowerCase()}`}>
+                        <span className={`api-method ${endpoint.method.toLowerCase()}`}>
                           {endpoint.method}
                         </span>
-                        <span className="endpoint-path">{endpoint.path}</span>
+                        <span className="endpoint-path">📌 {endpoint.path}</span>
                         <button
                           className="endpoint-btn"
                           onClick={() => openInputModal(endpoint)}
@@ -139,7 +143,7 @@ export default function Home() {
         )}
 
         {showInput && selectedEndpoint && (
-          <div className="modal">
+          <div className="floating-modal">
             <div className="modal-content">
               <h3>Masukkan Data</h3>
               {selectedEndpoint.parameters.length > 0 ? (
@@ -158,49 +162,29 @@ export default function Home() {
                 <p className="no-input">Endpoint ini tidak memerlukan input.</p>
               )}
               <div className="floating-buttons">
-                <button className="bubble-button" onClick={() => setShowInput(false)}>Tutup</button>
+                <button className="bubble-button" onClick={closeModal}>Tutup</button>
                 <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
               </div>
             </div>
           </div>
         )}
-
       </main>
 
       <style jsx>{`
-        .category-button {
-          background: linear-gradient(135deg, #3a3a6e, #5050a1);
+        .api-endpoint {
+          background: #3b0971;
           padding: 16px;
           border-radius: 12px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          cursor: pointer;
-          width: 100%;
-          border: none;
-          color: white;
-          font-size: 16px;
           margin-bottom: 15px;
-          transition: transform 0.3s ease-in-out;
+          transition: all 0.3s ease-in-out;
         }
 
-        .category-button:hover {
-          transform: scale(1.05);
+        .api-method.get {
+          color: #1e90ff;
         }
 
-        .api-endpoint {
-          background: #1e1e3f;
-          padding: 15px;
-          border-radius: 8px;
-          margin-top: 15px;
-        }
-
-        .floating-buttons {
-          display: flex;
-          gap: 10px;
-          position: fixed;
-          bottom: 20px;
-          right: 20px;
+        .api-method.post {
+          color: #32cd32;
         }
 
         .bubble-button {
@@ -210,11 +194,39 @@ export default function Home() {
           border-radius: 50px;
           border: none;
           cursor: pointer;
-          transition: transform 0.6s ease-out;
+          transition: transform 0.3s ease-in-out;
         }
 
         .bubble-button:hover {
-          transform: scale(1.1);
+          transform: scale(1.05);
+        }
+
+        .floating-modal {
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+        }
+
+        .modal-content {
+          background: #3a0ca3;
+          padding: 20px;
+          border-radius: 12px;
+          animation: bubble 0.5s ease-out;
+        }
+
+        @keyframes bubble {
+          from {
+            transform: scale(0.8);
+          }
+          to {
+            transform: scale(1);
+          }
         }
       `}</style>
     </>
