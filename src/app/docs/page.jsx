@@ -14,15 +14,15 @@ export default function Home() {
   const [apiResponse, setApiResponse] = useState(null);
 
   useEffect(() => {
-  const endpointsMap = calculateEndpointsByTag(swaggerConfig);
-  setEndpointsByTag(endpointsMap);
-  setTotalEndpoints(
-    Object.values(endpointsMap).reduce((sum, endpoints) => sum + endpoints.length, 0)
-  );
-  setTimeout(() => {
-    setLoading(false);
-  }, 2000);
-}, []);
+    const endpointsMap = calculateEndpointsByTag(swaggerConfig);
+    setEndpointsByTag(endpointsMap);
+    setTotalEndpoints(
+      Object.values(endpointsMap).reduce((sum, endpoints) => sum + endpoints.length, 0)
+    );
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  }, []);
 
   const calculateEndpointsByTag = (swaggerData) => {
     const tagEndpointMap = {};
@@ -63,7 +63,7 @@ export default function Home() {
     setInputFields((prev) => ({ ...prev, [param]: value }));
   };
 
-  const handleApiRequest = async (method) => {
+  const handleApiRequest = async () => {
     if (!selectedEndpoint) return;
 
     let finalUrl = selectedEndpoint.path;
@@ -88,7 +88,9 @@ export default function Home() {
       setApiResponse({ error: "Gagal mengambil data. Periksa kembali input yang dimasukkan." });
     }
 
-    setShowInput(true);
+    // Reset input & tutup modal setelah request
+    setInputFields({});
+    setShowInput(false);
   };
 
   return (
@@ -108,7 +110,7 @@ export default function Home() {
               <div className="api-category" onClick={() => toggleCategory(tag)}>
                 <span>{tag.toUpperCase()}</span>
                 <span className="category-count">{endpointsByTag[tag].length} endpoints</span>
-                <span className="icon">{expandedTag === tag ? "▼" : "▶"}</span>
+                <span className="icon">{expandedTag === tag ? "▼" : ">"}</span>
               </div>
 
               {expandedTag === tag && (
@@ -147,7 +149,7 @@ export default function Home() {
                     <input
                       type="text"
                       placeholder={`Masukkan ${param.name}`}
-                      value={inputFields[param.name]}
+                      value={inputFields[param.name] || ""}
                       onChange={(e) => handleInputChange(param.name, e.target.value)}
                     />
                   </div>
@@ -155,10 +157,10 @@ export default function Home() {
               ) : (
                 <p className="no-input">Endpoint ini tidak memerlukan input.</p>
               )}
-              {/* Tombol Kirim di dalam modal-content dibuat floating */}
-              <button className="floating-btn" onClick={handleApiRequest}>
-                ➤ Kirim
-              </button>
+              <div className="modal-buttons">
+                <button className="transparent-btn" onClick={() => setShowInput(false)}>Tutup</button>
+                <button className="transparent-btn" onClick={handleApiRequest}>Kirim</button>
+              </div>
             </div>
           </div>
         )}
@@ -194,13 +196,6 @@ export default function Home() {
           background: #5050a1;
         }
 
-        .api-endpoint {
-          background: #2e2e5a;
-          padding: 10px;
-          border-radius: 8px;
-          margin-top: 8px;
-        }
-
         .modal {
           position: fixed;
           top: 0;
@@ -222,32 +217,23 @@ export default function Home() {
           max-width: 500px;
         }
 
-        .floating-btn {
-          position: absolute;
-          bottom: 20px;
-          right: 20px;
-          background: #6a0dad;
+        .modal-buttons {
+          display: flex;
+          justify-content: space-between;
+          margin-top: 10px;
+        }
+
+        .transparent-btn {
+          background: transparent;
+          border: 1px solid white;
           color: white;
-          padding: 12px 20px;
-          border-radius: 50px;
-          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+          padding: 10px 15px;
           cursor: pointer;
-          font-size: 16px;
-          transition: background 0.3s ease-in-out;
-        }
-
-        .floating-btn:hover {
-          background: #822adf;
-        }
-
-        .response-box {
-          background: #2c2c5a;
-          padding: 15px;
           border-radius: 8px;
-          margin-top: 40px;
-          overflow-x: auto;
-          white-space: pre-wrap;
-          word-wrap: break-word;
+        }
+
+        .transparent-btn:hover {
+          background: rgba(255, 255, 255, 0.2);
         }
       `}</style>
     </>
