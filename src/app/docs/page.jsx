@@ -14,18 +14,16 @@ export default function Home() {
   const [apiResponse, setApiResponse] = useState(null);
 
   useEffect(() => {
-    const endpointsMap = calculateEndpointsByTag(swaggerConfig);
+    const { endpointsMap, total } = calculateEndpointsByTag(swaggerConfig);
     setEndpointsByTag(endpointsMap);
-    setTotalEndpoints(
-      Object.values(endpointsMap).reduce((sum, endpoints) => sum + endpoints.length, 0)
-    );
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+    setTotalEndpoints(total);
+    setLoading(false);
   }, []);
 
   const calculateEndpointsByTag = (swaggerData) => {
     const tagEndpointMap = {};
+    let total = 0;
+
     Object.keys(swaggerData.paths).forEach((path) => {
       Object.keys(swaggerData.paths[path]).forEach((method) => {
         const operation = swaggerData.paths[path][method];
@@ -38,11 +36,13 @@ export default function Home() {
               description: operation.summary || "Deskripsi tidak tersedia",
               parameters: operation.parameters || [],
             });
+            total++;
           });
         }
       });
     });
-    return tagEndpointMap;
+
+    return { endpointsMap: tagEndpointMap, total };
   };
 
   const toggleCategory = (tag) => {
@@ -94,7 +94,7 @@ export default function Home() {
     }
 
     setInputFields({});
-    setShowInput(false);
+    setShowInput(true);
   };
 
   return (
@@ -169,8 +169,7 @@ export default function Home() {
   </div>
 )}
 
-{/* Hasil API Response */}
-{apiResponse && selectedEndpoint && (
+{handleApiRequest && selectedEndpoint && (
   <div className="api-result">
     <h3>Hasil API Response</h3>
     <div className="result-content">
@@ -189,7 +188,7 @@ export default function Home() {
       </main>
       <style jsx>{`
 .endpoint {
-    background: #2D1B55; /* Ungu gelap */
+    background: #2D1B55;
     border-radius: 0.75rem;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
