@@ -13,41 +13,38 @@ export default function Home() {
   const [inputFields, setInputFields] = useState({});
   const [apiResponse, setApiResponse] = useState(null);
 
-  // Fungsi menghitung total endpoint berdasarkan kategori (tags)
-  const calculateEndpointsByTag = (swaggerData) => {
-    const tagEndpointMap = {};
-    if (!swaggerData?.paths) return tagEndpointMap;
+  useEffect(() => {
+    const calculateEndpointsByTag = (swaggerData) => {
+      const tagEndpointMap = {};
+      if (!swaggerData?.paths) return tagEndpointMap;
 
-    Object.entries(swaggerData.paths).forEach(([path, methods]) => {
-      Object.entries(methods).forEach(([method, operation]) => {
-        if (!operation?.tags) return;
+      Object.entries(swaggerData.paths).forEach(([path, methods]) => {
+        Object.entries(methods).forEach(([method, operation]) => {
+          if (!operation?.tags) return;
 
-        operation.tags.forEach((tag) => {
-          if (!tagEndpointMap[tag]) tagEndpointMap[tag] = [];
-          tagEndpointMap[tag].push({
-            method: method.toUpperCase(),
-            path,
-            description: operation?.summary || "Deskripsi tidak tersedia",
-            parameters: operation?.parameters || [],
+          operation.tags.forEach((tag) => {
+            if (!tagEndpointMap[tag]) tagEndpointMap[tag] = [];
+            tagEndpointMap[tag].push({
+              method: method.toUpperCase(),
+              path,
+              description: operation?.summary || "Deskripsi tidak tersedia",
+              parameters: operation?.parameters || [],
+            });
           });
         });
       });
-    });
 
-    return tagEndpointMap;
-  };
+      return tagEndpointMap;
+    };
 
-  useEffect(() => {
     const endpointsMap = calculateEndpointsByTag(swaggerConfig);
     setEndpointsByTag(endpointsMap);
-    
-    // Menghitung total endpoints
+
     const total = Object.values(endpointsMap).reduce(
       (sum, endpoints) => sum + endpoints.length,
       0
     );
     setTotalEndpoints(total);
-
     setLoading(false);
   }, []);
 
@@ -67,107 +64,101 @@ export default function Home() {
 
   const closeModal = () => {
     setInputFields({});
-    setApiResponse(null); // Hasil response terhapus otomatis saat modal ditutup
+    setApiResponse(null);
     setShowInput(false);
   };
 
-  const handleInputChange = (param, value) => {
-    setInputFields((prev) => ({ ...prev, [param]: value }));
-  };
+  return (
+    <>
+      <Head>
+        <title>API Explorer</title>
+      </Head>
 
-  const handleApiRequest = async () => {
-    if (!selectedEndpoint) return;
+      <main>
+        {loading ? (
+          <p className="loading-text">Memuat data...</p>
+        ) : (
+          <div>
+            <h1>Total Endpoints: {totalEndpoints}</h1>
 
-    let finalUrl = selectedEndpoint.path;
-    Object.keys(inputFields).forEach((param) => {
-      finalUrl = finalUrl.replace(`{${param}}`, inputFields[param]);
-    });
+            {Object.keys(endpointsByTag).map((tag) => (
+              <div key={tag} className="category-wrapper">
+                <div className="api-category" onClick={() => toggleCategory(tag)}>
+                  {tag}
+                  <span className="icon">{expandedTag === tag ? "▼" : "▶"}</span>
+                </div>
 
-    const options = {
-      method: selectedEndpoint.method,
-      headers: { "Content-Type": "application/json" },
-    };
-
-    if (selectedEndpoint.method === "POST") {
-      options.body = JSON.stringify(inputFields);
-    }
-
-    try {
-      const response = await fetch(finalUrl, options);
-      const contentType = response.headers.get("content-type");
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      let data;
-      if (contentType?.includes("application/json")) {
-        data = await response.json();
-      } else {
-        data = await response.text();
-      }
-
-      setApiResponse(data);
-    } catch (error) {
-      setApiResponse({ error: error.message || "Gagal mengambil data." });
-    }
-
-    setInputFields({});
-  };
-
-  const closeModal = () => {
-  setInputFields({});
-  setApiResponse(null);
-  setShowInput(false);
-};
-
-{showInput && selectedEndpoint && (
-  <div className="floating-modal">
-    <div className="modal-content">
-      <h3>Masukkan Data</h3>
-
-      {selectedEndpoint.parameters.length > 0 ? (
-        selectedEndpoint.parameters.map((param) => (
-          <div key={param.name} className="input-group">
-            <label>{param.name}</label>
-            <input
-              type="text"
-              placeholder={`Masukkan ${param.name}`}
-              value={inputFields[param.name] || ""}
-              onChange={(e) => handleInputChange(param.name, e.target.value)}
-            />
+                {expandedTag === tag &&
+                  endpointsByTag[tag].map((endpoint) => (
+                    <div key={endpoint.path} className="api-endpoint">
+                      <div className="endpoint-header">
+                        <span className={`api-method ${endpoint.method.toLowerCase()}`}>
+                          {endpoint.method}
+                        </span>
+                        <span className="endpoint-path">{endpoint.path}</span>
+                        <button className="endpoint-btn" onClick={() => openInputModal(endpoint)}>
+                          ➜
+                        </button>
+                      </div>
+                      <p className="endpoint-description">{endpoint.description}</p>
+                    </div>
+                  ))}
+              </div>
+            ))}
           </div>
-        ))
-      ) : (
-        <p className="no-input">Endpoint ini tidak memerlukan input.</p>
-      )}
+        )}
 
-      <div className="floating-buttons">
-        <button className="bubble-button" onClick={closeModal}>Tutup</button>
-        <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
-      </div>
-{apiResponse !== null && (
+        {showInput && selectedEndpoint && (
+          <div className="floating-modal">
+            <div className="modal-content">
+              <h3>Masukkan Data</h3>
+
+              {selectedEndpoint.parameters.length > 0 ? (
+                selectedEndpoint.parameters.map((param) => (
+                  <div key={param.name} className="input-group">
+                    <label>{param.name}</label>
+                    <input
+                      type="text"
+                      placeholder={`Masukkan ${param.name}`}
+                      value={inputFields[param.name] || ""}
+                      onChange={(e) => setInputFields((prev) => ({ ...prev, [param.name]: e.target.value }))}
+                    />
+                  </div>
+                ))
+              ) : (
+                <p className="no-input">Endpoint ini tidak memerlukan input.</p>
+              )}
+
+              <div className="floating-buttons">
+                <button className="bubble-button" onClick={closeModal}>
+                  Tutup
+                </button>
+                <button className="bubble-button" onClick={() => handleApiRequest(selectedEndpoint)}>
+                  Kirim
+                </button>
+              </div>
+
+              {apiResponse !== null && (
                 <div className="api-result">
                   <h3>Response Body</h3>
-                  <button className="copy-btn" onClick={() => navigator.clipboard.writeText(
-                      typeof apiResponse === "object" 
-                        ? JSON.stringify(apiResponse, null, 2) 
-                        : apiResponse
-                    )}>
+                  <button
+                    className="copy-btn"
+                    onClick={() =>
+                      navigator.clipboard.writeText(
+                        typeof apiResponse === "object" ? JSON.stringify(apiResponse, null, 2) : apiResponse
+                      )
+                    }
+                  >
                     Copy
                   </button>
-                  
-                  <pre>
-                    {typeof apiResponse === "object"
-                      ? JSON.stringify(apiResponse, null, 2)
-                      : apiResponse}
-                  </pre>
-                  
-                  <button className="download-btn" onClick={() => {
+
+                  <pre>{typeof apiResponse === "object" ? JSON.stringify(apiResponse, null, 2) : apiResponse}</pre>
+
+                  <button
+                    className="download-btn"
+                    onClick={() => {
                       const blob = new Blob(
-                        [typeof apiResponse === "object" 
-                          ? JSON.stringify(apiResponse, null, 2) 
-                          : apiResponse], 
+                        [typeof apiResponse === "object" ? JSON.stringify(apiResponse, null, 2) : apiResponse],
                         { type: "application/json" }
                       );
                       const url = URL.createObjectURL(blob);
@@ -176,7 +167,8 @@ export default function Home() {
                       a.download = "api_response.json";
                       a.click();
                       URL.revokeObjectURL(url);
-                    }}>
+                    }}
+                  >
                     <i className="fas fa-download"></i> Download
                   </button>
                 </div>
