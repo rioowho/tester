@@ -7,27 +7,21 @@ import swaggerConfig from "../swagger-config.json";
 export default function Home() {
   const [endpointsByTag, setEndpointsByTag] = useState({});
   const [expandedTag, setExpandedTag] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [totalEndpoints, setTotalEndpoints] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [inputFields, setInputFields] = useState({});
   const [selectedEndpoint, setSelectedEndpoint] = useState(null);
-  const [inputValue, setInputValue] = useState("");
-  const [apiResult, setApiResult] = useState(null);
+  const [apiResponse, setApiResponse] = useState(null);
+  const [showInput, setShowInput] = useState(false);
+  const [showFullResponse, setShowFullResponse] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
       const endpointsMap = calculateEndpointsByTag(swaggerConfig);
-      
-      if (Object.keys(endpointsMap).length > 0) {
-        const total = Object.values(endpointsMap).reduce(
-          (sum, endpoints) => sum + endpoints.length,
-          0
-        );
-        setTotalEndpoints(total);
-      } else {
-        setTotalEndpoints(0);
-      }
-
       setEndpointsByTag(endpointsMap);
+      setTotalEndpoints(
+        Object.values(endpointsMap).reduce((sum, endpoints) => sum + endpoints.length, 0)
+      );
       setLoading(false);
     }, 1000);
   }, []);
@@ -44,6 +38,7 @@ export default function Home() {
               method: method.toUpperCase(),
               path,
               description: operation.summary || "Deskripsi tidak tersedia",
+              parameters: operation.parameters || [],
             });
           });
         }
@@ -56,20 +51,38 @@ export default function Home() {
     setExpandedTag(expandedTag === tag ? null : tag);
   };
 
-  const handleInputSubmit = () => {
-    if (selectedEndpoint && inputValue.trim() !== "") {
-      // Simulasi hasil API berdasarkan input
-      setApiResult({
-        status: true,
-        creator: "VelynTeam",
-        data: `Hasil dari input "${inputValue}" pada endpoint ${selectedEndpoint.path}`,
-      });
+  const openInputModal = (endpoint) => {
+    const defaultInputs = {};
+    endpoint.parameters.forEach((param) => {
+      defaultInputs[param.name] = "";
+    });
+    setInputFields(defaultInputs);
+    setSelectedEndpoint(endpoint);
+    setShowInput(true);
+  };
 
-      // Reset input setelah submit
-      setTimeout(() => {
-        setInputValue("");
-      }, 500);
+  const handleInputChange = (param, value) => {
+    setInputFields((prev) => ({ ...prev, [param]: value }));
+  };
+
+  const handleInputSubmit = async () => {
+    if (!selectedEndpoint) return;
+
+    let finalUrl = selectedEndpoint.path;
+    Object.keys(inputFields).forEach((param) => {
+      finalUrl = finalUrl.replace(`{${param}}`, inputFields[param]);
+    });
+
+    try {
+      const response = await fetch(finalUrl, { method: selectedEndpoint.method });
+      const data = await response.json();
+      setApiResponse(data);
+    } catch (error) {
+      setApiResponse({ error: "Gagal mengambil data. Periksa kembali input yang dimasukkan." });
     }
+
+    // Setelah submit, tutup modal input
+    setShowInput(false);
   };
 
   return (
@@ -77,43 +90,41 @@ export default function Home() {
       <Head>
         <title>VelynAPI</title>
       </Head>
-      <main className="container mx-auto p-6 text-white">
-        <h1 className="text-3xl font-bold">VelynAPI Documentation</h1>
-        <p className="text-sm mt-2 mb-4">Total API Endpoint: {totalEndpoints}</p>
+      <main className="container">
+        <h1 className="title">VelynAPI Documentation</h1>
+        <p className="total-endpoints">Total API Endpoint: {totalEndpoints}</p>
 
         {loading ? (
-          <p>Memuat kategori...</p>
+          <p className="loading-text">Memuat kategori...</p>
         ) : (
           Object.keys(endpointsByTag).map((tag) => (
-            <div key={tag} className="mb-4">
-              {/* Kategori API */}
-              <div
-                className="bg-blue-900 p-4 rounded-lg flex justify-between items-center cursor-pointer hover:bg-blue-800"
-                onClick={() => toggleCategory(tag)}
-              >
-                <span className="font-semibold">{tag.toUpperCase()} ENDPOINT</span>
-                <span>{endpointsByTag[tag].length} endpoint</span>
-                {expandedTag === tag ? <FaChevronDown /> : <FaChevronRight />}
+            <div key={tag} className="category-wrapper">
+              <div className="api-category" onClick={() => toggleCategory(tag)}>
+                <span>{tag.toUpperCase()}</span>
+                <span className="category-count">{endpointsByTag[tag].length} endpoint</span>
+                <span className="icon">
+                  {expandedTag === tag ? <FaChevronDown /> : <FaChevronRight />}
+                </span>
               </div>
 
-              {/* Daftar Endpoint */}
               {expandedTag === tag && (
-                <div className="mt-2">
+                <div className="endpoints-container">
                   {endpointsByTag[tag].map((endpoint, index) => (
-                    <div key={index} className="bg-gray-800 p-3 rounded-lg mt-2">
-                      <div className="flex justify-between items-center">
-                        <span className={`font-bold px-2 py-1 rounded ${endpoint.method === "GET" ? "bg-green-600" : "bg-red-600"}`}>
+                    <div key={index} className="api-endpoint">
+                      <div className="api-endpoint-header">
+                        <span className={`api-endpoint-method ${endpoint.method}`}>
                           {endpoint.method}
                         </span>
-                        <span>{endpoint.path}</span>
-                        <button
-                          className="text-blue-400 hover:text-blue-300"
-                          onClick={() => setSelectedEndpoint(endpoint)}
+                        <span className="endpoint-path">{endpoint.path}</span>
+                        <span
+                          className="endpoint-link"
+                          onClick={() => openInputModal(endpoint)}
+                          title="Masukkan data untuk endpoint ini"
                         >
                           <FaExternalLinkAlt />
-                        </button>
+                        </span>
                       </div>
-                      <p className="text-xs text-gray-400">{endpoint.description}</p>
+                      <p className="endpoint-description">{endpoint.description}</p>
                     </div>
                   ))}
                 </div>
@@ -122,37 +133,83 @@ export default function Home() {
           ))
         )}
 
-        {/* Input dan Hasil API */}
-        {selectedEndpoint && (
-          <div className="bg-gray-900 p-4 rounded-lg mt-6">
-            <h2 className="text-lg font-semibold mb-2">Masukkan Input untuk {selectedEndpoint.path}</h2>
-            <input
-              type="text"
-              className="w-full p-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Masukkan teks..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-            />
-            <button
-              className="mt-3 bg-blue-600 px-4 py-2 rounded hover:bg-blue-500"
-              onClick={handleInputSubmit}
-            >
-              Submit
-            </button>
-
-            {/* Hasil API */}
-            {apiResult && (
-              <div className="bg-black p-3 rounded mt-4 text-sm text-gray-300">
-                <pre>{JSON.stringify(apiResult, null, 2)}</pre>
-              </div>
-            )}
+        {showInput && selectedEndpoint && (
+          <div className="modal">
+            <div className="modal-content">
+              <h3>Masukkan Data untuk Endpoint</h3>
+              {selectedEndpoint.parameters.length > 0 ? (
+                selectedEndpoint.parameters.map((param) => (
+                  <div key={param.name}>
+                    <label>{param.name}:</label>
+                    <input
+                      type="text"
+                      placeholder={`Masukkan ${param.name}`}
+                      value={inputFields[param.name]}
+                      onChange={(e) => handleInputChange(param.name, e.target.value)}
+                    />
+                  </div>
+                ))
+              ) : (
+                <p>Endpoint ini tidak memerlukan input.</p>
+              )}
+              <button className="submit-btn" onClick={handleInputSubmit}>
+                Kirim
+              </button>
+              <button className="close-btn" onClick={() => setShowInput(false)}>
+                Tutup
+              </button>
+            </div>
           </div>
         )}
 
-        <footer className="text-center text-gray-500 text-sm mt-10">
-          VelynTeam © All rights reserved 2025.
-        </footer>
+        {apiResponse && (
+          <div className="api-response">
+            <h3>Hasil API:</h3>
+            <pre>
+              {showFullResponse
+                ? JSON.stringify(apiResponse, null, 2)
+                : JSON.stringify(apiResponse, null, 2).slice(0, 200)}
+            </pre>
+            {JSON.stringify(apiResponse).length > 200 && (
+              <button onClick={() => setShowFullResponse(!showFullResponse)}>
+                {showFullResponse ? "Sembunyikan" : "Tampilkan Semua"}
+              </button>
+            )}
+          </div>
+        )}
       </main>
+
+      <style jsx>{`
+        .container {
+          max-width: 600px;
+          margin: auto;
+          padding: 20px;
+        }
+
+        .api-category {
+          background: #1e1e40;
+          border-radius: 12px;
+          padding: 16px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          cursor: pointer;
+        }
+
+        .endpoints-container {
+          padding: 10px;
+          background: #22224a;
+          border-radius: 8px;
+          margin-top: 5px;
+        }
+
+        .api-endpoint {
+          background: #2c2c5a;
+          border-radius: 10px;
+          padding: 12px;
+          margin-top: 10px;
+        }
+      `}</style>
     </>
   );
 }
