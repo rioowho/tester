@@ -16,17 +16,16 @@ export default function Home() {
   const [totalEndpoints, setTotalEndpoints] = useState(0);
 
   useEffect(() => {
-    // Menghitung total endpoint dari swaggerConfig
-    let count = 0;
+    console.log("Swagger Config Loaded:", swaggerConfig);
+
+    // Menghitung total endpoint
     if (swaggerConfig.paths) {
-      count = Object.keys(swaggerConfig.paths).length;
+      setTotalEndpoints(Object.keys(swaggerConfig.paths).length);
     }
-    setTotalEndpoints(count);
   }, []);
 
-  const categories = Object.keys(swaggerConfig.tags || {}).map((tag) => ({
-    name: tag,
-  }));
+  // Ambil kategori API dari `tags`
+  const categories = swaggerConfig.tags || [];
 
   return (
     <>
@@ -80,6 +79,7 @@ export default function Home() {
               </button>
             ))}
           </div>
+
           {selectedCategory && (
             <div className="card">
               <SwaggerUI
@@ -87,7 +87,7 @@ export default function Home() {
                   ...swaggerConfig,
                   paths: Object.fromEntries(
                     Object.entries(swaggerConfig.paths).filter(([_, value]) =>
-                      value.tags.includes(selectedCategory)
+                      value.tags && value.tags.includes(selectedCategory)
                     )
                   ),
                 }}
