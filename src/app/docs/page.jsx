@@ -158,49 +158,52 @@ export default function Home() {
           ))
         )}
 
-        {showInput && selectedEndpoint && (
-          <div className="floating-modal">
-            <div className="modal-content">
-              <h3>Masukkan Data</h3>
-              {selectedEndpoint.parameters.length > 0 ? (
-                selectedEndpoint.parameters.map((param) => (
-                  <div key={param.name} className="input-group">
-                    <label>{param.name}</label>
-                    <input
-                      type="text"
-                      placeholder={`Masukkan ${param.name}`}
-                      value={inputFields[param.name] || ""}
-                      onChange={(e) => handleInputChange(param.name, e.target.value)}
-                    />
-                  </div>
-                ))
-              ) : (
-                <p className="no-input">Endpoint ini tidak memerlukan input.</p>
-              )}
-              <div className="floating-buttons">
-                <button className="bubble-button" onClick={closeModal}>Tutup</button>
-                <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
-              </div>
-            </div>
+{showInput && selectedEndpoint && (
+  <div className="floating-modal">
+    <div className="modal-content">
+      <button className="close-btn" onClick={closeModal}>✖</button>
+      <h3>Masukkan Data</h3>
+      
+      {selectedEndpoint.parameters.length > 0 ? (
+        selectedEndpoint.parameters.map((param) => (
+          <div key={param.name} className="input-group">
+            <label>{param.name}</label>
+            <input
+              type="text"
+              placeholder={`Masukkan ${param.name}`}
+              value={inputFields[param.name] || ""}
+              onChange={(e) => handleInputChange(param.name, e.target.value)}
+            />
           </div>
-        )}
+        ))
+      ) : (
+        <p className="no-input">Endpoint ini tidak memerlukan input.</p>
+      )}
+      
+      <div className="floating-buttons">
+        <button className="bubble-button" onClick={closeModal}>Tutup</button>
+        <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
+      </div>
 
-        {apiResponse !== null && selectedEndpoint && (
-          <div className="api-result">
-            <h3>Hasil API Response</h3>
-            <div className="result-content">
-              {typeof apiResponse === "object" && !Array.isArray(apiResponse) ? (
-                Object.entries(apiResponse).map(([key, value], index) => (
-                  <div key={index} className="result-item">
-                    <strong>{key}:</strong> {JSON.stringify(value)}
-                  </div>
-                ))
-              ) : (
-                <p className="error-message">{apiResponse || "Terjadi kesalahan."}</p>
-              )}
-            </div>
-          </div>
-        )}
+      {apiResponse !== null && (
+        <div className="api-result">
+          <h3>Response Body</h3>
+          <button className="copy-btn" onClick={() => navigator.clipboard.writeText(JSON.stringify(apiResponse, null, 2))}>Copy</button>
+          <button className="download-btn" onClick={() => {
+            const blob = new Blob([JSON.stringify(apiResponse, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "api_response.json";
+            a.click();
+            URL.revokeObjectURL(url);
+          }}>Download</button>
+          <pre>{JSON.stringify(apiResponse, null, 2)}</pre>
+        </div>
+      )}
+    </div>
+  </div>
+)}
       </main>
 <style jsx>{`
 .endpoint {
@@ -482,22 +485,47 @@ export default function Home() {
     }
 }
 .api-result {
-    background: rgba(45, 27, 85, 0.95); /* Ungu gelap transparan */
-    color: white;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    margin-top: 1.5rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    max-width: 100%;
-    word-wrap: break-word;
-    overflow-x: auto;
+  background-color: #1e1e1e;
+  color: #dcdcdc;
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 15px;
+  overflow-x: auto;
+  font-family: monospace;
+  position: relative;
+}
+
+.copy-btn, .download-btn {
+  position: absolute;
+  top: 10px;
+  right: 50px;
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 3px;
+}
+
+.copy-btn {
+  right: 95px;
+}
+
+.copy-btn:hover, .download-btn:hover {
+  background: #0056b3;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .api-result h3 {
     margin-bottom: 1rem;
     font-size: 1.3rem;
     font-weight: bold;
-    color: #a67aff; /* Warna ungu terang */
+    color: #a67aff; 
 }
 
 .result-content {
