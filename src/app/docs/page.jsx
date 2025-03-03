@@ -204,9 +204,6 @@ export default function Home() {
           </div>
         )}
       </main>
-    </>
-  );
-}
 <style jsx>{`
 .endpoint {
     background: #2D1B55;
