@@ -170,6 +170,27 @@ export default function Home() {
         )}
       </main>
       <style jsx>{`
+       .endpoint {
+    background: #2D1B55; 
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+    color: white; 
+}
+
+        .endpoint:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
   .endpoint-btn {
     margin-left: 15px; 
     padding: 8px 12px;
