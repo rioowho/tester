@@ -1,18 +1,22 @@
 "use client";
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import { FaChevronRight, FaChevronDown } from "react-icons/fa";
+import { FaChevronRight, FaChevronDown, FaExternalLinkAlt } from "react-icons/fa";
 import swaggerConfig from "../swagger-config.json";
 
 export default function Home() {
   const [endpointsByTag, setEndpointsByTag] = useState({});
   const [expandedTag, setExpandedTag] = useState(null);
+  const [totalEndpoints, setTotalEndpoints] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setTimeout(() => {
       const endpointsMap = calculateEndpointsByTag(swaggerConfig);
       setEndpointsByTag(endpointsMap);
+      setTotalEndpoints(
+        Object.values(endpointsMap).reduce((sum, endpoints) => sum + endpoints.length, 0)
+      );
       setLoading(false);
     }, 1000);
   }, []);
@@ -41,6 +45,12 @@ export default function Home() {
     setExpandedTag(expandedTag === tag ? null : tag);
   };
 
+  const openApiLink = (path) => {
+    const baseUrl = swaggerConfig.servers?.[0]?.url || ""; // Gunakan base URL dari Swagger config
+    const fullUrl = `${baseUrl}${path}`;
+    window.open(fullUrl, "_blank");
+  };
+
   return (
     <>
       <Head>
@@ -48,7 +58,10 @@ export default function Home() {
       </Head>
       <main className="container">
         <h1 className="title">VelynAPI Documentation</h1>
-        
+
+        {/* Menampilkan total endpoint */}
+        <p className="total-endpoints">Total API Endpoint: {totalEndpoints}</p>
+
         {loading ? (
           <p className="loading-text">Memuat kategori...</p>
         ) : (
@@ -58,6 +71,7 @@ export default function Home() {
               <div className="api-category" onClick={() => toggleCategory(tag)}>
                 <div className="api-category-header">
                   <span>{tag.toUpperCase()}</span>
+                  <span className="category-count">{endpointsByTag[tag].length} endpoint</span>
                   <span className="icon">
                     {expandedTag === tag ? <FaChevronDown /> : <FaChevronRight />}
                   </span>
@@ -74,6 +88,13 @@ export default function Home() {
                           {endpoint.method}
                         </span>
                         <span className="endpoint-path">{endpoint.path}</span>
+                        <span
+                          className="endpoint-link"
+                          onClick={() => openApiLink(endpoint.path)}
+                          title="Buka API"
+                        >
+                          <FaExternalLinkAlt />
+                        </span>
                       </div>
                       <p className="endpoint-description">{endpoint.description}</p>
                     </div>
@@ -103,6 +124,14 @@ export default function Home() {
           font-size: 24px;
           font-weight: bold;
           text-align: center;
+          margin-bottom: 10px;
+        }
+
+        .total-endpoints {
+          font-size: 18px;
+          font-weight: bold;
+          text-align: center;
+          color: #dddddd;
           margin-bottom: 20px;
         }
 
@@ -142,6 +171,12 @@ export default function Home() {
           width: 100%;
         }
 
+        .category-count {
+          font-size: 14px;
+          color: #bbbbbb;
+          margin-left: auto;
+        }
+
         .api-category .icon {
           font-size: 18px;
           color: #ffffff;
@@ -162,6 +197,9 @@ export default function Home() {
           margin-top: 10px;
           border: 1px solid #4a4a8a;
           transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
         }
 
         .api-endpoint:hover {
@@ -172,6 +210,7 @@ export default function Home() {
           display: flex;
           justify-content: space-between;
           align-items: center;
+          width: 100%;
           font-size: 14px;
           color: #ffffff;
         }
@@ -188,15 +227,15 @@ export default function Home() {
         .api-endpoint-method.PUT { background: #ffc107; color: black; }
         .api-endpoint-method.DELETE { background: #dc3545; color: white; }
 
-        .endpoint-path {
+        .endpoint-link {
+          color: #00bfff;
+          cursor: pointer;
+          margin-left: 10px;
           font-size: 14px;
-          font-weight: bold;
         }
 
-        .endpoint-description {
-          font-size: 12px;
-          color: #cccccc;
-          margin-top: 5px;
+        .endpoint-link:hover {
+          color: #009acd;
         }
 
         @keyframes fadeIn {
