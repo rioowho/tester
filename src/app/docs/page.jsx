@@ -125,7 +125,7 @@ export default function Home() {
                         <span className={`api-method ${endpoint.method.toLowerCase()}`}>
                           {endpoint.method}
                         </span>
-                        <span className="endpoint-path">📌 {endpoint.path}</span>
+                        <span className="endpoint-path">{endpoint.path}</span>
                         <button
                           className="endpoint-btn"
                           onClick={() => openInputModal(endpoint)}
@@ -169,16 +169,20 @@ export default function Home() {
           </div>
         )}
       </main>
-
       <style jsx>{`
-        .api-endpoint {
-          background: #3b0971;
-          padding: 16px;
-          border-radius: 12px;
-          margin-bottom: 15px;
-          transition: all 0.3s ease-in-out;
-        }
-
+  .endpoint-btn {
+    margin-left: 15px; 
+    padding: 8px 12px;
+    font-size: 18px;
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+  }
+  .endpoint-btn:hover {
+    transform: scale(1.1);
+  }
         .api-method.get {
           color: #1e90ff;
         }
@@ -213,12 +217,25 @@ export default function Home() {
           height: 100%;
         }
 
-        .modal-content {
-          background: #3a0ca3;
-          padding: 20px;
-          border-radius: 12px;
-          animation: bubble 0.5s ease-out;
-        }
+    .modal-content {
+    background: #3a0ca3;
+    padding: 25px; 
+    border-radius: 12px;
+    animation: bubble 0.5s ease-out;
+  }
+
+  .input-group {
+    margin-bottom: 15px; 
+  }
+
+  .input-group input {
+    background: #2b0c5e; 
+    border: 1px solid #5a189a;
+    padding: 10px;
+    border-radius: 6px;
+    color: white;
+    width: 100%;
+  }
 
         @keyframes bubble {
           from {
