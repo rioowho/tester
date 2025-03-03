@@ -9,6 +9,10 @@ export default function Home() {
   const [expandedTag, setExpandedTag] = useState(null);
   const [totalEndpoints, setTotalEndpoints] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [inputData, setInputData] = useState("");
+  const [selectedEndpoint, setSelectedEndpoint] = useState(null);
+  const [apiResponse, setApiResponse] = useState(null);
+  const [showInput, setShowInput] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
@@ -45,10 +49,18 @@ export default function Home() {
     setExpandedTag(expandedTag === tag ? null : tag);
   };
 
-  const openApiLink = (path) => {
-    const baseUrl = swaggerConfig.servers?.[0]?.url || ""; // Gunakan base URL dari Swagger config
-    const fullUrl = `${baseUrl}${path}`;
-    window.open(fullUrl, "_blank");
+  const handleInputSubmit = async () => {
+    if (!inputData || !selectedEndpoint) return;
+
+    const finalUrl = selectedEndpoint.path.replace("{input}", inputData); // Ganti {input} dengan data user
+
+    try {
+      const response = await fetch(finalUrl, { method: selectedEndpoint.method });
+      const data = await response.json();
+      setApiResponse(data);
+    } catch (error) {
+      setApiResponse({ error: "Gagal mengambil data. Periksa kembali input yang dimasukkan." });
+    }
   };
 
   return (
@@ -90,8 +102,11 @@ export default function Home() {
                         <span className="endpoint-path">{endpoint.path}</span>
                         <span
                           className="endpoint-link"
-                          onClick={() => openApiLink(endpoint.path)}
-                          title="Buka API"
+                          onClick={() => {
+                            setShowInput(true);
+                            setSelectedEndpoint(endpoint);
+                          }}
+                          title="Masukkan data untuk endpoint ini"
                         >
                           <FaExternalLinkAlt />
                         </span>
@@ -103,6 +118,31 @@ export default function Home() {
               )}
             </div>
           ))
+        )}
+
+        {/* Form Input Data */}
+        {showInput && (
+          <div className="modal">
+            <div className="modal-content">
+              <h3>Masukkan Data untuk Endpoint</h3>
+              <input
+                type="text"
+                placeholder="Masukkan teks atau parameter"
+                value={inputData}
+                onChange={(e) => setInputData(e.target.value)}
+              />
+              <button onClick={handleInputSubmit}>Kirim</button>
+              <button onClick={() => setShowInput(false)}>Tutup</button>
+            </div>
+          </div>
+        )}
+
+        {/* Menampilkan hasil API */}
+        {apiResponse && (
+          <div className="api-response">
+            <h3>Hasil API:</h3>
+            <pre>{JSON.stringify(apiResponse, null, 2)}</pre>
+          </div>
         )}
       </main>
 
@@ -141,10 +181,6 @@ export default function Home() {
           color: #cccccc;
         }
 
-        .category-wrapper {
-          margin-bottom: 16px;
-        }
-
         .api-category {
           background: #16163a;
           border-radius: 12px;
@@ -157,29 +193,10 @@ export default function Home() {
           text-transform: uppercase;
           font-weight: bold;
           font-size: 16px;
-          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .api-category:hover {
           background: #21214d;
-        }
-
-        .api-category-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          width: 100%;
-        }
-
-        .category-count {
-          font-size: 14px;
-          color: #bbbbbb;
-          margin-left: auto;
-        }
-
-        .api-category .icon {
-          font-size: 18px;
-          color: #ffffff;
         }
 
         .endpoints-container {
@@ -187,7 +204,6 @@ export default function Home() {
           background: #1e1e40;
           border-radius: 8px;
           margin-top: 5px;
-          animation: fadeIn 0.3s ease-in-out;
         }
 
         .api-endpoint {
@@ -195,37 +211,9 @@ export default function Home() {
           border-radius: 10px;
           padding: 12px;
           margin-top: 10px;
-          border: 1px solid #4a4a8a;
-          transition: all 0.3s ease;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
-
-        .api-endpoint:hover {
-          background: #29295b;
-        }
-
-        .api-endpoint-header {
           display: flex;
           justify-content: space-between;
-          align-items: center;
-          width: 100%;
-          font-size: 14px;
-          color: #ffffff;
         }
-
-        .api-endpoint-method {
-          font-weight: bold;
-          padding: 5px 10px;
-          border-radius: 6px;
-          text-transform: uppercase;
-        }
-
-        .api-endpoint-method.GET { background: #28a745; color: white; }
-        .api-endpoint-method.POST { background: #007bff; color: white; }
-        .api-endpoint-method.PUT { background: #ffc107; color: black; }
-        .api-endpoint-method.DELETE { background: #dc3545; color: white; }
 
         .endpoint-link {
           color: #00bfff;
@@ -234,13 +222,30 @@ export default function Home() {
           font-size: 14px;
         }
 
-        .endpoint-link:hover {
-          color: #009acd;
+        .modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-5px); }
-          to { opacity: 1; transform: translateY(0); }
+        .modal-content {
+          background: #22224a;
+          padding: 20px;
+          border-radius: 10px;
+          text-align: center;
+        }
+
+        .api-response {
+          margin-top: 20px;
+          background: #1e1e40;
+          padding: 10px;
+          border-radius: 8px;
         }
       `}</style>
     </>
