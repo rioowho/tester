@@ -166,52 +166,51 @@ export default function Home() {
         )}
       </div>
 
-      {showInput && selectedEndpoint && (
-        <div>
-          <h3>Input Parameters for {selectedEndpoint.method} {selectedEndpoint.path}</h3>
-          <form>
-            {selectedEndpoint.parameters.map((param) => (
-              <div key={param.name}>
-                <label>{param.name}</label>
-                <input
-                  type="text"
-                  value={inputFields[param.name] || ""}
-                  onChange={(e) =>
-                    setInputFields({
-                      ...inputFields,
-                      [param.name]: e.target.value
-                    })
-                  }
-                />
-              </div>
-            ))}
-          </form>
-          <button onClick={handleApiRequest}>Kirim</button>
-          <button onClick={closeModal}>Tutup</button>
-        </div>
-      )}
-
-      {apiResponse && (
-        <div>
-          {apiResponse.debugUrl && (
-            <p>
-              <strong>Debug URL:</strong> {apiResponse.debugUrl}
-            </p>
-          )}
-          {apiResponse.status && <p>{apiResponse.status}</p>}
-          {apiResponse.error && <p style={{ color: "red" }}>{apiResponse.error}</p>}
-          {apiResponse.data && (
-            <div>
-              <pre>{JSON.stringify(apiResponse.data, null, 2)}</pre>
-              <button onClick={handleCopy}>Copy</button>
-              <button onClick={handleDownload}>Download</button>
+    {showInput && selectedEndpoint && (
+      <div>
+        <h3>Input Parameters for {selectedEndpoint.method} {selectedEndpoint.path}</h3>
+        <form>
+          {selectedEndpoint.parameters.map((param) => (
+            <div key={param.name}>
+              <label>{param.name}</label>
+              <input
+                type="text"
+                value={inputFields[param.name] || ""}
+                onChange={(e) =>
+                  setInputFields({
+                    ...inputFields,
+                    [param.name]: e.target.value
+                  })
+                }
+              />
             </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
+          ))}
+        </form>
+        <button onClick={handleApiRequest}>Kirim</button>
+        <button onClick={closeModal}>Tutup</button>
+      </div>
+    )}
+
+    {apiResponse && (
+      <div>
+        {apiResponse.debugUrl && (
+          <p>
+            <strong>Debug URL:</strong> {apiResponse.debugUrl}
+          </p>
+        )}
+        {apiResponse.status && <p>{apiResponse.status}</p>}
+        {apiResponse.error && <p style={{ color: "red" }}>{apiResponse.error}</p>}
+        {apiResponse.data && (
+          <div>
+            <pre>{JSON.stringify(apiResponse.data, null, 2)}</pre>
+            <button onClick={handleCopy}>Copy</button>
+            <button onClick={handleDownload}>Download</button>
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+);
 <style jsx>{`
 .endpoint {
     background: #2D1B55;
