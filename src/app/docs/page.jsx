@@ -118,10 +118,10 @@ export default function Home() {
               </div>
 
               {expandedTag === tag && (
-                <div className="endpoints-container">
+                <div className="endpoint">
                   {endpointsByTag[tag].map((endpoint, index) => (
                     <div key={index} className="api-endpoint">
-                      <div className="api-endpoint-header">
+                      <div className="endpoint-header">
                         <span className={`api-method ${endpoint.method.toLowerCase()}`}>
                           {endpoint.method}
                         </span>
@@ -170,47 +170,86 @@ export default function Home() {
         )}
       </main>
       <style jsx>{`
-       .endpoint {
-    background: #2D1B55; 
+/* Container utama untuk semua endpoint */
+.endpoint {
+    background: #2D1B55; /* Ungu gelap */
     border-radius: 0.75rem;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border: 1px solid var(--border-color);
-    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
-    color: white; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    color: white;
 }
 
-        .endpoint:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .endpoint-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-  .endpoint-btn {
-    margin-left: 15px; 
-    padding: 8px 12px;
-    font-size: 18px;
-    background: transparent;
-    border: none;
+/* Setiap API Endpoint */
+.api-endpoint {
+    background: rgba(255, 255, 255, 0.1); /* Transparan sedikit */
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     color: white;
-    cursor: pointer;
-    transition: transform 0.2s ease-in-out;
-  }
-  .endpoint-btn:hover {
-    transform: scale(1.1);
-  }
-        .api-method.get {
-          color: #1e90ff;
-        }
+}
 
-        .api-method.post {
-          color: #32cd32;
-        }
+.api-endpoint:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.endpoint-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+.api-method {
+    font-size: 0.9rem;
+    font-weight: bold;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.5rem;
+    text-transform: uppercase;
+}
+
+.api-method.get {
+    background: #007bff; l
+    color: white;
+}
+
+.api-method.post {
+    background: #28a745;
+    color: white;
+}
+
+.endpoint-path {
+    flex-grow: 1;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.endpoint-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out;
+}
+
+.endpoint-btn:hover {
+    color: white;
+}
+
+.endpoint-description {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+}
 
         .bubble-button {
           background: #5a189a;
