@@ -14,13 +14,15 @@ export default function Home() {
   const [apiResponse, setApiResponse] = useState(null);
 
   useEffect(() => {
-    const endpointsMap = calculateEndpointsByTag(swaggerConfig);
-    setEndpointsByTag(endpointsMap);
-    setTotalEndpoints(
-      Object.values(endpointsMap).reduce((sum, endpoints) => sum + endpoints.length, 0)
-    );
-    setLoading(true);
-  }, []);
+  const endpointsMap = calculateEndpointsByTag(swaggerConfig);
+  setEndpointsByTag(endpointsMap);
+  setTotalEndpoints(
+    Object.values(endpointsMap).reduce((sum, endpoints) => sum + endpoints.length, 0)
+  );
+  setTimeout(() => {
+    setLoading(false);
+  }, 2000);
+}, []);
 
   const calculateEndpointsByTag = (swaggerData) => {
     const tagEndpointMap = {};
