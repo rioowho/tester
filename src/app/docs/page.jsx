@@ -29,7 +29,7 @@ export default function Home() {
               path,
               description: operation?.description || "Deskripsi tidak tersedia",
               parameters: operation?.parameters || [],
-              serverUrl: swaggerData.servers?.[0]?.url || "", // Ambil base URL jika ada
+              serverUrl: swaggerData.servers?.[0]?.url || "", 
             });
           });
         });
@@ -61,7 +61,7 @@ export default function Home() {
     setInputFields(defaultInputs);
     setSelectedEndpoint(endpoint);
     setShowInput(true);
-    setApiResponse(null); // Reset response lama
+    setApiResponse(null);
   };
 
   const closeModal = () => {
@@ -73,9 +73,11 @@ export default function Home() {
 const handleApiRequest = async () => {
   if (!selectedEndpoint) return;
 
-  let finalUrl = selectedEndpoint.path;
+  let finalUrl = selectedEndpoint.path.startsWith("http")
+    ? selectedEndpoint.path 
+    : `${selectedEndpoint.serverUrl}${selectedEndpoint.path}`; 
   Object.keys(inputFields).forEach((param) => {
-    finalUrl = finalUrl.replace(`{${param}}`, inputFields[param]);
+    finalUrl = finalUrl.replace(`{${param}}`, encodeURIComponent(inputFields[param]));
   });
 
   const options = {
@@ -106,8 +108,6 @@ const handleApiRequest = async () => {
   } catch (error) {
     setApiResponse({ error: error.message || "Gagal mengambil data." });
   }
-
-  // Reset input tanpa menghapus respons API
   setInputFields({});
 };
 
