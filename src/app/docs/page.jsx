@@ -1,4 +1,3 @@
-
 "use client";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -188,9 +187,6 @@ export default function Home() {
           </button>
         </div>
       )}
-    </div>
-  </div>
-)}
 </main>
 <style jsx>{`
 .endpoint {
