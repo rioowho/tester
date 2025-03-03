@@ -70,46 +70,34 @@ export default function Home() {
     setShowInput(false);
   };
 
+import axios from 'axios';
+
 const handleApiRequest = async () => {
   if (!selectedEndpoint) return;
-
-  // Menentukan URL final, baik absolut maupun relatif
+  let baseUrl = selectedEndpoint.serverUrl.replace(/\/$/, ""); // Hapus slash di akhir server URL
+  let endpointPath = selectedEndpoint.path.replace(/^\//, ""); // Hapus slash di awal path
   let finalUrl = selectedEndpoint.path.startsWith("http")
-    ? selectedEndpoint.path // Gunakan langsung jika absolut
-    : `${selectedEndpoint.serverUrl.replace(/\/$/, "")}/${selectedEndpoint.path.replace(/^\//, "")}`; // Gabungkan serverUrl & path tanpa double slash
-
-  // Ganti parameter dalam URL jika ada
+    ? selectedEndpoint.path
+    : `${baseUrl}/${endpointPath}`;
   Object.keys(inputFields).forEach((param) => {
     finalUrl = finalUrl.replace(`{${param}}`, encodeURIComponent(inputFields[param] || ""));
   });
-
-  const options = {
-    method: selectedEndpoint.method,
-    headers: { "Content-Type": "application/json" },
-  };
-
-  if (selectedEndpoint.method === "POST") {
-    options.body = JSON.stringify(inputFields);
+  if (/\{.*?\}/.test(finalUrl)) {
+    setApiResponse({ error: "Ada parameter dalam URL yang belum diisi." });
+    return;
   }
+  setApiResponse({ debugUrl: finalUrl, status: "Fetching..." });
 
   try {
-    const response = await fetch(finalUrl, options);
-    const contentType = response.headers.get("content-type");
+    const response = await axios.get(finalUrl, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
-    }
-
-    let data;
-    if (contentType?.includes("application/json")) {
-      data = await response.json();
-    } else {
-      data = await response.text();
-    }
-
-    setApiResponse(data);
+    setApiResponse(response.data); // Tampilkan response dari API
   } catch (error) {
-    console.error("API Request Error:", error); 
+    console.error("API Request Error:", error);
     setApiResponse({ error: error.message || "Gagal mengambil data dari API." });
   }
   setInputFields({});
