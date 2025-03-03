@@ -70,8 +70,6 @@ export default function Home() {
     setShowInput(false);
   };
 
-import axios from 'axios';
-
 const handleApiRequest = async () => {
   if (!selectedEndpoint) return;
   let baseUrl = selectedEndpoint.serverUrl.replace(/\/$/, ""); // Hapus slash di akhir server URL
