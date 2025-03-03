@@ -72,9 +72,7 @@ export default function Home() {
 
   const handleApiRequest = async (endpoint) => {
   setApiResponse(null);
-
-  const baseUrl = swaggerConfig.servers.[0].url;
-
+  const baseUrl = swaggerConfig.servers?.[0]?.url;
   if (!baseUrl) {
     setApiResponse({ error: "Base URL tidak ditemukan di swaggerConfig" });
     return;
