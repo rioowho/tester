@@ -161,9 +161,8 @@ export default function Home() {
 {showInput && selectedEndpoint && (
   <div className="floating-modal">
     <div className="modal-content">
-      <button className="close-btn" onClick={closeModal}>✖</button>
       <h3>Masukkan Data</h3>
-      
+
       {selectedEndpoint.parameters.length > 0 ? (
         selectedEndpoint.parameters.map((param) => (
           <div key={param.name} className="input-group">
@@ -179,7 +178,7 @@ export default function Home() {
       ) : (
         <p className="no-input">Endpoint ini tidak memerlukan input.</p>
       )}
-      
+
       <div className="floating-buttons">
         <button className="bubble-button" onClick={closeModal}>Tutup</button>
         <button className="bubble-button" onClick={handleApiRequest}>Kirim</button>
@@ -188,7 +187,10 @@ export default function Home() {
       {apiResponse !== null && (
         <div className="api-result">
           <h3>Response Body</h3>
-          <button className="copy-btn" onClick={() => navigator.clipboard.writeText(JSON.stringify(apiResponse, null, 2))}>Copy</button>
+          <button className="copy-btn" onClick={() => navigator.clipboard.writeText(JSON.stringify(apiResponse, null, 2))}>
+            Copy
+          </button>
+          <pre>{JSON.stringify(apiResponse, null, 2)}</pre>
           <button className="download-btn" onClick={() => {
             const blob = new Blob([JSON.stringify(apiResponse, null, 2)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
@@ -197,8 +199,9 @@ export default function Home() {
             a.download = "api_response.json";
             a.click();
             URL.revokeObjectURL(url);
-          }}>Download</button>
-          <pre>{JSON.stringify(apiResponse, null, 2)}</pre>
+          }}>
+            <i className="fas fa-download"></i> Download
+          </button>
         </div>
       )}
     </div>
@@ -495,10 +498,10 @@ export default function Home() {
   position: relative;
 }
 
-.copy-btn, .download-btn {
+.copy-btn {
   position: absolute;
   top: 10px;
-  right: 50px;
+  left: 10px;
   background: #007bff;
   color: white;
   border: none;
@@ -508,12 +511,31 @@ export default function Home() {
   border-radius: 3px;
 }
 
-.copy-btn {
-  right: 95px;
+.download-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 5px;
+  margin-top: 10px;
+  width: 100%;
 }
 
-.copy-btn:hover, .download-btn:hover {
+.download-btn i {
+  margin-right: 5px;
+}
+
+.copy-btn:hover {
   background: #0056b3;
+}
+
+.download-btn:hover {
+  background: #218838;
 }
 
 pre {
