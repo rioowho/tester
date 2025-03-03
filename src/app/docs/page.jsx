@@ -54,35 +54,83 @@ export default function Home() {
           <h1 className="total-endpoints">Total Endpoints: {totalEndpoints}</h1>
 
           <div className="category-container">
-            {categories.length > 0 ? (
-              categories.map((category, index) => (
-                <button
-                  key={index}
-                  className={`category-button ${selectedCategory === category.name ? "active" : ""}`}
-                  onClick={() => setSelectedCategory(category.name)}
-                >
-                  {category.name} {category.count} endpoint
-                  <span className="arrow">{selectedCategory === category.name ? "▲" : "▶"}</span>
-                </button>
-              ))
-            ) : (
-              <p>Tidak ada kategori tersedia</p>
-            )}
-          </div>
-          {selectedCategory && (
-            <div className="swagger-container">
-              <SwaggerUI
-                spec={{
-                  ...swaggerConfig,
-                  paths: Object.fromEntries(
-                    Object.entries(swaggerConfig.paths).filter(([_, value]) =>
-                      Object.values(value).some((method) => method.tags?.includes(selectedCategory))
-                    )
-                  ),
-                }}
-              />
-            </div>
-          )}
+  {categories.length > 0 ? (
+    categories.map((category, index) => (
+      <button
+        key={index}
+        className={`category-button ${selectedCategory === category.name ? "active" : ""}`}
+        onClick={() => setSelectedCategory(selectedCategory === category.name ? null : category.name)}
+        style={{
+          width: "80%",
+          background: selectedCategory === category.name ? "#251d6d" : "#181842",
+          padding: "14px 18px",
+          borderRadius: "8px",
+          color: "white",
+          fontSize: "18px",
+          fontWeight: "bold",
+          border: "none",
+          cursor: "pointer",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          position: "relative",
+          transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+          transform: selectedCategory === category.name ? "translateY(-5px)" : "none",
+          boxShadow: selectedCategory === category.name 
+            ? "0 8px 15px rgba(74, 12, 131, 0.5)" 
+            : "0 4px 6px rgba(90, 12, 163, 0.4)",
+        }}
+      >
+        {selectedCategory === category.name && (
+          <span 
+            style={{
+              position: "absolute",
+              left: "10px",
+              fontSize: "18px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              color: "white",
+            }}
+          >
+            ✖
+          </span>
+        )}
+        {category.name} {category.count} endpoint
+        <span style={{ fontSize: "16px", transition: "transform 0.3s ease-in-out" }}>
+          {selectedCategory === category.name ? "▲" : "▶"}
+        </span>
+      </button>
+    ))
+  ) : (
+    <p>Tidak ada kategori tersedia</p>
+  )}
+</div>
+{selectedCategory && (
+  <div 
+    style={{
+      marginTop: "20px",
+      width: "90%",
+      maxWidth: "1200px",
+      background: "#1a1a2e",
+      borderRadius: "10px",
+      padding: "20px",
+      boxShadow: "0 4px 8px rgba(255, 255, 255, 0.1)",
+      overflow: "hidden"
+    }}
+  >
+    <SwaggerUI
+      spec={{
+        ...swaggerConfig,
+        info: {}, // Menghapus bagian atas Swagger UI (judul & versi)
+        paths: Object.fromEntries(
+          Object.entries(swaggerConfig.paths).filter(([_, value]) =>
+            Object.values(value).some((method) => method.tags?.includes(selectedCategory))
+          )
+        ),
+      }}
+    />
+  </div>
+)}
         </div>
       </main>
 
@@ -97,16 +145,16 @@ export default function Home() {
     font-size: 24px;
     font-weight: bold;
     text-align: center;
-    margin-bottom: 5px; /* Jarak lebih dekat */
+    margin-bottom: 2px; /* Lebih dekat ke kategori */
   }
   .category-container {
     display: flex;
     flex-direction: column;
-    gap: 8px; /* Jarak antar kategori */
+    gap: 6px; /* Sedikit jarak antar kategori */
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
-    margin-top: 2px; /* Kategori lebih dekat ke total endpoints */
+    margin-top: 0px; 
   }
   .category-button {
     width: 80%;
