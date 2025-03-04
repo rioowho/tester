@@ -16,31 +16,28 @@ export default function Home() {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-  let count = 0;
-  const categoryCount = {};
+    let count = 0;
+    const categoryCount = {};
 
-  if (swaggerConfig && swaggerConfig.paths) {
-    Object.entries(swaggerConfig.paths).forEach(([path, methods]) => {
-      Object.entries(methods).forEach(([method, details]) => {
-        if (details && details.tags) {
-          count++;
-
-          details.tags.forEach((tag) => {
-            if (!categoryCount[tag]) {
-              categoryCount[tag] = 0;
-            }
-            // Menambahkan kategori untuk setiap tag
-            categoryCount[tag]++;
-          });
-        }
+    if (swaggerConfig && swaggerConfig.paths) {
+      Object.entries(swaggerConfig.paths).forEach(([path, methods]) => {
+        Object.entries(methods).forEach(([method, details]) => {
+          if (details && details.tags) {
+            count++;
+            details.tags.forEach((tag) => {
+              if (!categoryCount[tag]) {
+                categoryCount[tag] = 0;
+              }
+              categoryCount[tag]++;
+            });
+          }
+        });
       });
-    });
-  }
+    }
 
-  setTotalEndpoints(count);
-  setCategories(Object.entries(categoryCount).map(([name, count]) => ({ name, count })));
-
-}, [swaggerConfig]); 
+    setTotalEndpoints(count);
+    setCategories(Object.entries(categoryCount).map(([name, count]) => ({ name, count })));
+  }, [swaggerConfig]);
 
   return (
     <>
@@ -54,110 +51,116 @@ export default function Home() {
         <SpeedInsights />
 
         <div className="container">
-          <h1 className="total-endpoints">Total Endpoints: {totalEndpoints}</h1>
+          {/* Total Endpoints */}
+          <h1 className="total-endpoints" style={{ marginBottom: "20px" }}>
+            Total Endpoints: {totalEndpoints}
+          </h1>
 
+          {/* Category Buttons (Pindah ke atas) */}
           <div className="category-container">
-  {categories.length > 0 ? (
-    categories.map((category, index) => (
-      <button
-        key={index}
-        className={`category-button ${selectedCategory === category.name ? "active" : ""}`}
-        onClick={() => setSelectedCategory(selectedCategory === category.name ? null : category.name)}
-        style={{
-  width: "80%",
-  background: selectedCategory === category.name ? "#251d6d" : "#181842",
-  padding: "14px 18px",
-  borderRadius: "8px",
-  color: "white",
-  fontSize: "18px",
-  fontWeight: "bold",
-  border: "none",
-  cursor: "pointer",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  position: "relative",
-  transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-  transform: selectedCategory === category.name ? "translateY(-5px)" : "none",
-  boxShadow: selectedCategory === category.name 
-    ? "0 8px 15px rgba(74, 12, 131, 0.5)" 
-    : "0 4px 6px rgba(90, 12, 163, 0.4)",
-  marginTop: "5px"  
-}}
->
-        {selectedCategory === category.name && (
-          <span 
-            style={{
-              position: "absolute",
-              left: "10px",
-              fontSize: "18px",
-              fontWeight: "bold",
-              cursor: "pointer",
-              color: "white",
-            }}
-          >
-            ✖
-          </span>
-        )}
-        {category.name} {category.count} endpoint
-        <span style={{ fontSize: "16px", transition: "transform 0.3s ease-in-out" }}>
-          {selectedCategory === category.name ? "▲" : "▶"}
-        </span>
-      </button>
-    ))
-  ) : (
-    <p>Tidak ada kategori tersedia</p>
-  )}
-</div>
-{selectedCategory && (
-  <div 
-    style={{
-      position: "fixed",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-      width: "90%",
-      maxWidth: "1000px",
-      height: "80vh", 
-      background: "#220f40",
-      borderRadius: "15px",
-      padding: "20px",
-      boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
-      overflowY: "auto", // Tambahkan scroll jika konten terlalu panjang
-      zIndex: 1000,
-    }}
-  >
-    {/* Tombol silang untuk menutup */}
-    <span 
-      onClick={() => setSelectedCategory(null)} 
-      style={{
-        position: "absolute",
-        top: "10px",
-        left: "10px",
-        fontSize: "20px",
-        fontWeight: "bold",
-        cursor: "pointer",
-        color: "white",
-      }}
-    >
-      ✖
-    </span>
+            {categories.length > 0 ? (
+              categories.map((category, index) => (
+                <button
+                  key={index}
+                  className={`category-button ${selectedCategory === category.name ? "active" : ""}`}
+                  onClick={() => setSelectedCategory(selectedCategory === category.name ? null : category.name)}
+                  style={{
+                    width: "80%",
+                    background: selectedCategory === category.name ? "#251d6d" : "#181842",
+                    padding: "14px 18px",
+                    borderRadius: "8px",
+                    color: "white",
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    border: "none",
+                    cursor: "pointer",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    position: "relative",
+                    transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+                    transform: selectedCategory === category.name ? "translateY(-5px)" : "none",
+                    boxShadow: selectedCategory === category.name 
+                      ? "0 8px 15px rgba(74, 12, 131, 0.5)" 
+                      : "0 4px 6px rgba(90, 12, 163, 0.4)",
+                    marginTop: "5px"
+                  }}
+                >
+                  {selectedCategory === category.name && (
+                    <span 
+                      style={{
+                        position: "absolute",
+                        left: "10px",
+                        fontSize: "18px",
+                        fontWeight: "bold",
+                        cursor: "pointer",
+                        color: "white",
+                      }}
+                    >
+                      ✖
+                    </span>
+                  )}
+                  {category.name} {category.count} endpoint
+                  <span style={{ fontSize: "16px", transition: "transform 0.3s ease-in-out" }}>
+                    {selectedCategory === category.name ? "▲" : "▶"}
+                  </span>
+                </button>
+              ))
+            ) : (
+              <p>Tidak ada kategori tersedia</p>
+            )}
+          </div>
 
-    <SwaggerUI
-      spec={{
-        ...swaggerConfig,
-        info: {},
-        paths: Object.fromEntries(
-          Object.entries(swaggerConfig.paths).filter(([_, value]) =>
-            Object.values(value).some((method) => method.tags?.includes(selectedCategory))
-          )
-        ),
-      }}
-      docExpansion="none"
-      defaultModelsExpandDepth={-1}
-    />
-  </div>
-)}
+          {/* Modal Swagger UI */}
+          {selectedCategory && (
+            <div 
+              style={{
+                position: "fixed",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: "90%",
+                maxWidth: "1000px",
+                height: "80vh", 
+                background: "#220f40",
+                borderRadius: "15px",
+                padding: "20px",
+                boxShadow: "0 8px 16px rgba(0, 0, 0, 0.3)",
+                overflowY: "auto",
+                zIndex: 1000,
+              }}
+            >
+              {/* Tombol silang untuk menutup */}
+              <span 
+                onClick={() => setSelectedCategory(null)} 
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  left: "10px",
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  color: "white",
+                }}
+              >
+                ✖
+              </span>
+
+              <SwaggerUI
+                spec={{
+                  ...swaggerConfig,
+                  info: {},
+                  paths: Object.fromEntries(
+                    Object.entries(swaggerConfig.paths).filter(([_, value]) =>
+                      Object.values(value).some((method) => method.tags?.includes(selectedCategory))
+                    )
+                  ),
+                }}
+                docExpansion="none"
+                defaultModelsExpandDepth={-1}
+              />
+            </div>
+          )}
         </div>
       </main>
 
