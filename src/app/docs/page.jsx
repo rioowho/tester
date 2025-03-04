@@ -79,6 +79,7 @@ export default function Home() {
           boxShadow: selectedCategory === category.name 
             ? "0 8px 15px rgba(74, 12, 131, 0.5)" 
             : "0 4px 6px rgba(90, 12, 163, 0.4)",
+          marginTop: "15px" 
         }}
       >
         {selectedCategory === category.name && (
