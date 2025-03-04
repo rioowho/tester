@@ -16,28 +16,31 @@ export default function Home() {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    let count = 0;
-    const categoryCount = {};
+  let count = 0;
+  const categoryCount = {};
 
-    if (swaggerConfig.paths) {
-      Object.entries(swaggerConfig.paths).forEach(([path, methods]) => {
-        Object.values(methods).forEach((method) => {
-          if (method.tags) {
-            method.tags.forEach((tag) => {
-              if (!categoryCount[tag]) {
-                categoryCount[tag] = 0;
-              }
-              categoryCount[tag] += 1;
-            });
-          }
-          count += 1;
-        });
+  if (swaggerConfig && swaggerConfig.paths) {
+    Object.entries(swaggerConfig.paths).forEach(([path, methods]) => {
+      Object.entries(methods).forEach(([method, details]) => {
+        if (details && details.tags) {
+          count++;
+
+          details.tags.forEach((tag) => {
+            if (!categoryCount[tag]) {
+              categoryCount[tag] = 0;
+            }
+            // Menambahkan kategori untuk setiap tag
+            categoryCount[tag]++;
+          });
+        }
       });
-    }
+    });
+  }
 
-    setTotalEndpoints(count);
-    setCategories(Object.entries(categoryCount).map(([name, count]) => ({ name, count })));
-  }, []);
+  setTotalEndpoints(count);
+  setCategories(Object.entries(categoryCount).map(([name, count]) => ({ name, count })));
+
+}, [swaggerConfig]); 
 
   return (
     <>
@@ -169,33 +172,34 @@ export default function Home() {
     font-size: 24px;
     font-weight: bold;
     text-align: center;
-    margin-bottom: 2px; /* Lebih dekat ke kategori */
+    margin-bottom: 2px; 
   }
   .category-container {
-    display: flex;
-    flex-direction: column;
-    gap: 6px; /* Sedikit jarak antar kategori */
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-    margin-top: 0px; 
-  }
-  .category-button {
-    width: 80%;
-    background: #181842;
-    padding: 14px 18px;
-    border-radius: 8px;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    transition: 0.3s ease-in-out;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 6px rgba(90, 12, 163, 0.4);
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* Sedikit jarak antar kategori */
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  margin-top: 5px;  
+}
+.category-button {
+  width: 80%;
+  background: #181842;
+  padding: 14px 18px;
+  border-radius: 8px;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(90, 12, 163, 0.4);
+  margin-top: 5px;  
+}
   .category-button:hover {
     background: #20205a;
     transform: scale(1.05);
