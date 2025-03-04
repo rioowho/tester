@@ -64,27 +64,26 @@ export default function Home() {
         className={`category-button ${selectedCategory === category.name ? "active" : ""}`}
         onClick={() => setSelectedCategory(selectedCategory === category.name ? null : category.name)}
         style={{
-          width: "80%",
-          background: selectedCategory === category.name ? "#251d6d" : "#181842",
-          padding: "14px 18px",
-          borderRadius: "8px",
-          color: "white",
-          fontSize: "18px",
-          fontWeight: "bold",
-          border: "none",
-          cursor: "pointer",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          position: "relative",
-          transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-          transform: selectedCategory === category.name ? "translateY(-5px)" : "none",
-          boxShadow: selectedCategory === category.name 
-            ? "0 8px 15px rgba(74, 12, 131, 0.5)" 
-            : "0 4px 6px rgba(90, 12, 163, 0.4)",
-          marginTop: "15px" 
-        }}
-      >
+  width: "80%",
+  background: selectedCategory === category.name ? "#251d6d" : "#181842",
+  padding: "14px 18px",
+  borderRadius: "8px",
+  color: "white",
+  fontSize: "18px",
+  fontWeight: "bold",
+  border: "none",
+  cursor: "pointer",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  position: "relative",
+  transition: "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
+  transform: selectedCategory === category.name ? "translateY(-5px)" : "none",
+  boxShadow: selectedCategory === category.name 
+    ? "0 8px 15px rgba(74, 12, 131, 0.5)" 
+    : "0 4px 6px rgba(90, 12, 163, 0.4)",
+  marginTop: "5px"  
+}}
         {selectedCategory === category.name && (
           <span 
             style={{
