@@ -84,6 +84,7 @@ export default function Home() {
     : "0 4px 6px rgba(90, 12, 163, 0.4)",
   marginTop: "5px"  
 }}
+>
         {selectedCategory === category.name && (
           <span 
             style={{
