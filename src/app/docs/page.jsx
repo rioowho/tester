@@ -174,15 +174,16 @@ export default function Home() {
     text-align: center;
     margin-bottom: 2px; 
   }
-  .category-container {
+.category-container {
   display: flex;
   flex-direction: column;
-  gap: 6px; /* Sedikit jarak antar kategori */
+  gap: 6px; 
   justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
   margin-top: 5px;  
+  margin-bottom: 0px;  
 }
+
 .category-button {
   width: 80%;
   background: #181842;
@@ -198,7 +199,7 @@ export default function Home() {
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 4px 6px rgba(90, 12, 163, 0.4);
-  margin-top: 5px;  
+  margin-top: 5px; 
 }
   .category-button:hover {
     background: #20205a;
