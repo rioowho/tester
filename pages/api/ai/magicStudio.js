@@ -1,3 +1,4 @@
+import { validateApiKey } from "../../../apikeyy.js";
 import { CREATOR } from "../../../settings.js";
 import axios from "axios";
 import FormData from "form-data";
@@ -11,6 +12,8 @@ export default async function handler(req, res) {
         });
     }
 
+    try {
+        await validateApiKey(req, res, async () => {
             const { prompt } = req.query;
 
             if (!prompt) {
@@ -39,7 +42,16 @@ export default async function handler(req, res) {
                     error: "Internal Server Error",
                 });
             }
+        });
+    } catch (error) {
+        console.error("API Key validation error:", error);
+        res.status(500).json({
+            status: false,
+            creator: CREATOR,
+            error: "Internal Server Error",
+        });
     }
+}
 
 function getTimestamp() {
     return (Date.now() / 1000).toFixed(3);
